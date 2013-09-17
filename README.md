@@ -4,7 +4,7 @@ Aftermath v0.0.1
 A [Roguelike](http://roguebasin.roguelikedevelopment.org/index.php?title=Berlin_Interpretation) zombie survival game
 written in C# using Monogame.
 
-See notes below for the latest Msi installer for the game.
+See installing section below for a link to the latest msi installer for the game.
 
 -----
 
