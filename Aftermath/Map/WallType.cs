@@ -11,6 +11,15 @@ namespace Aftermath.Map
     public enum WallType
     {
         None,
-        Steel
+        Steel,
+        Door
+    }
+
+    public enum FloorType
+    {
+        Tile,
+        Road,
+        RoadLine,
+        Carpet
     }
 }

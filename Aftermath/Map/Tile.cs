@@ -45,6 +45,8 @@ namespace Aftermath.Map
         {
             get
             {
+                if (Wall == WallType.Door)
+                    return false;
                 return Wall != WallType.None;
             }
         }
@@ -56,6 +58,8 @@ namespace Aftermath.Map
         {
             get
             {
+                if (Wall == WallType.Door)
+                    return true;
                 return Wall == WallType.None;
             }
         }
@@ -93,6 +97,8 @@ namespace Aftermath.Map
         /// Returns the type of wall on this tile. If no wall is present then the tile is floor.
         /// </summary>
         public WallType Wall = WallType.None;
+
+        public FloorType Floor = FloorType.Tile;
 
         /// <summary>
         /// Returns whether a specified creature can enter this tile

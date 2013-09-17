@@ -102,8 +102,8 @@ namespace Aftermath.Rendering
             float scaleW = 1 / (float)sourceRect.Width * dest.Width;
             float scaleH = 1 / (float)sourceRect.Height * dest.Height;
 
-            origin.X *= xnaTexture.Width;
-            origin.Y *= xnaTexture.Height;
+            origin.X *= sourceRect.Width;
+            origin.Y *= sourceRect.Height;
 
             SpriteEffects effects = SpriteEffects.None;
             if (flipHorizontal)

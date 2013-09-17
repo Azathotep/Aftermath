@@ -69,6 +69,9 @@ namespace Aftermath.Core
         public void Initialize()
         {
             _world = new World(10, 10);
+            CityBuilder builder = new CityBuilder();
+            _world = builder.FromBitmap(@"Content\city.bmp");
+
             _camera.Position = new Vector2F(5.5f, 5.5f);
             _player = new Player();
             _turnSystem.RegisterCreature(_player);
@@ -195,34 +198,86 @@ namespace Aftermath.Core
                         Tile south = tile.GetNeighbour(CompassDirection.South);
                         if (south != null && south.Wall == WallType.None && _playerSeenTiles.Contains(south))
                         {
-                            if (tile.X % 9 == 0)
-                                textureName = "steel.wallnorth2";
-                            else
-                                textureName = "steel.wallnorth1";
+                            textureName = "house.northwall";
                         }
                         else
-                            textureName = "steel.solidwall";
+                            textureName = "house.solidwall";
+                    }
+
+                    if (tile.Floor == FloorType.Carpet)
+                        textureName = "house.carpet";
+
+                    if (tile.Wall == WallType.Door)
+                        textureName = "house.opendoor";
+
+                    if (tile.Floor == FloorType.Road)
+                        textureName = "road.road1";
+
+                    float rotation = 0;
+                    if (tile.Floor == FloorType.RoadLine)
+                    {
+                        textureName = "road.roadLinesHz";
+                        Tile north = tile.GetNeighbour(CompassDirection.North);
+                        
+                        Tile south = tile.GetNeighbour(CompassDirection.South);
+                        Tile east = tile.GetNeighbour(CompassDirection.North);
+                        Tile west = tile.GetNeighbour(CompassDirection.South);
+                        
+                        bool[] connected = new bool[4];
+                        foreach (CompassDirection direction in Compass.CardinalDirections)
+                        {
+                            Tile neighbour = tile.GetNeighbour(direction);
+                            if (neighbour == null)
+                                continue;
+                            if (neighbour.Floor == FloorType.RoadLine)
+                                connected[(int)direction] = true;
+                        }
+                        if (connected[(int)CompassDirection.North] && connected[(int)CompassDirection.East])
+                        {
+                            textureName = "road.corner";
+                            rotation = MathHelper.Pi + MathHelper.PiOver2;
+                        }
+                        else if (connected[(int)CompassDirection.North] && connected[(int)CompassDirection.West])
+                        {
+                            textureName = "road.corner";
+                            rotation = MathHelper.Pi;
+                        }
+                        else if (connected[(int)CompassDirection.South] && connected[(int)CompassDirection.East])
+                        {
+                            textureName = "road.corner";
+                            rotation = 0;
+                        }
+                        else if (connected[(int)CompassDirection.South] && connected[(int)CompassDirection.West])
+                        {
+                            textureName = "road.corner";
+                            rotation = MathHelper.PiOver2;
+                        }
+                        else if (connected[(int)CompassDirection.North] || connected[(int)CompassDirection.South])
+                        {
+                            textureName = "road.roadLinesHz";
+                            rotation = MathHelper.PiOver2;
+                        }                           
                     }
 
                     bool isVisible = _playerVisibleTiles.Contains(tile);
                     bool hasSeen = _playerSeenTiles.Contains(tile);
-                    isVisible = true;
+                    //isVisible = true;
                     if (!isVisible && !hasSeen)
                         continue;
-                    _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, 0, new Vector2F(0, 0), Color.AliceBlue);
+                    _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
                     if (isVisible)
                     {
                         if (tile.Creature != null)
                         {
                             GameTexture texture = tile.Creature.Texture;
                             bool flipHorizontal = !tile.Creature.FacingRight;
-                            _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.5f, 0, new Vector2F(0, 0), Color.AliceBlue, flipHorizontal);
+                            _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.5f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue, flipHorizontal);
                         }
                     }
                     else
                     {
                         //tile not visible but remembered. Draw dark overlay.
-                        _renderer.Draw(new GameTexture("floorTexture", new RectangleI(0, 0, 64, 64)), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0, 0), new Color(0, 0, 0, 0.5f));
+                        _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.5f));
                     }
                 }
 
@@ -238,6 +293,8 @@ namespace Aftermath.Core
         internal void LoadContent()
         {
             _textureManager.RegisterSpriteSheetTextures("steel");
+            _textureManager.RegisterSpriteSheetTextures("road");
+            _textureManager.RegisterSpriteSheetTextures("house");
         }
 
         internal HashSet<Tile> GetFov(int eyeX, int eyeY, int sightRadius)
