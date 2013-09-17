@@ -6,9 +6,9 @@ written in C# using Monogame.
 
 -----
 
-The city has been overrun by zombies! You are one of the few survivors.
+![Screenshot](https://github.com/Azathotep/Aftermath/raw/master//Images/screenshot1.png)
 
-![screenshot](azathotep.github.com/aftermath/images/screenshot1.png)
+The city has been overrun by zombies! You are one of the few survivors.
 
 Game vision:
 
