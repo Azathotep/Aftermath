@@ -1,4 +1,4 @@
-Aftermath v0.0001
+Aftermath v0.0002
 ============
 
 A [Roguelike](http://roguebasin.roguelikedevelopment.org/index.php?title=Berlin_Interpretation) zombie survival game
@@ -24,14 +24,14 @@ Game vision:
  - A storyline and clues concerning the cause of the outbreak and a possible cure, which the player is under no obligation to follow.
 
 Ideas for gameplay options:
- - UK rules. Guns and ammunition are far rarer. More reliance on melee weapons and running away.
+ - UK rules. Guns and ammunition are rare. More reliance on melee weapons and running away.
  - US rules. Abundant guns and ammunition.
  - On The Same Team. Survivors do not attack each other.
  - Realistic Damage. Hostile survivors can kill you in one shot with weapons.
  - Not Immune. One zombie bite is fatal.
  - Afraid of the Dark. Game is always in daytime.
 
-The current version is an small 10x10 empty map with a few randomly shuffling peaceful zombies.
+The current version is a small handdrawn map with a few roads, buildings and zombies.
 
 Requires monogame to build. The main dev trunk, not the latest release binaries.
 I am currently building off the fork I took (https://github.com/Azathotep/MonoGame)
