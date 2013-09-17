@@ -50,5 +50,6 @@ Latest .msi installer for the game can be downloaded here:
 [Aftermath v0.0.1](https://github.com/Azathotep/Aftermath/blob/gh-pages/installers/Aftermath_v0_0_1.msi)
 (See notes below on installing)
 
-The installer does not currently check for or install DirectX and the .Net Framework 4 redistributable. You will have to manually make DirectX and .Net Framework 4 are installed/ up to date. If they aren't the game fail to start.
+-The installer installs the game into the chosen folder (default under program files). It does not create a start menu item or desktop item. You have to go into the game folder manually and run aftermath.exe.
+-The installer does not check whether for DirectX and .Net Framework 4. You will have to manually make sure DirectX and .Net Framework 4 are installed / up to date. If they are not the game will fail to start.
 
