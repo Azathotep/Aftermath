@@ -8,6 +8,8 @@ written in C# using Monogame.
 
 The city has been overrun by zombies! You are one of the few survivors.
 
+azathotep.github.com/aftermath/images/screenshot1.png
+
 Game vision:
 
  - Sandbox simulation of a zombie outbreak in a large city environment.
