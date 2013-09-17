@@ -2,7 +2,7 @@ Aftermath v0.0.1
 ============
 
 A [Roguelike](http://roguebasin.roguelikedevelopment.org/index.php?title=Berlin_Interpretation) zombie survival game
-written in C# using Monogame.
+written in C# using Monogame. The game is very early in development.
 
 For the latest release (msi installer) [see the releases page](https://github.com/Azathotep/Aftermath/releases)
 
@@ -34,8 +34,6 @@ Ideas for gameplay options:
  - Realistic Damage. Hostile survivors can kill you in one shot with weapons.
  - Not Immune. One zombie bite is fatal.
  - Afraid of the Dark. Game is always in daytime.
-
-The current version is a small handdrawn map with a few roads, buildings and zombies.
 
 Building
 ======
