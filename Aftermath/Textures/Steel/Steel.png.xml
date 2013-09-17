@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<main size="64">
+  <image name="floor.png" x="1" y="1" />
+  <image name="solidwall.png" x="67" y="1" />
+  <image name="wallnorth1.png" x="133" y="1" />
+  <image name="wallnorth2.png" x="1" y="67" />
+</main>
