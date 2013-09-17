@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="cd1ea433-d973-445a-afc3-ce7fb5c75de1" Name="Aftermath v0.01" Language="1033" Version="0.0.1.0" Manufacturer="NA" UpgradeCode="c9c4e79d-66cd-434f-af39-d79ec22a6675">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Description="Aftermath v0.01 Installer" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<Media Id='1' Cabinet='Data.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
+    <Property Id='DiskPrompt' Value="Aftermath Installation [1]" />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="Aftermath">
+          <Directory Id="Bin" Name="Bin">
+            <Directory Id="Content" Name="Content">
+              <Directory Id="SpriteSheets" Name="SpriteSheets"/>
+            </Directory>
+          </Directory>
+        </Directory>
+			</Directory>
+		</Directory>
+  
+    <ComponentGroup Id="ProductExecutables" Directory="Bin">
+      <Component Id="ProductComponent" Guid="764afb51-895f-4307-9539-2576c3859a2c">
+        <File Id='AftermathEXE' Name='Aftermath.exe' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Aftermath.exe' KeyPath='yes'/>
+        <File Id='MonogameDLL' Name='MonoGame.Framework.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\MonoGame.Framework.dll'/>
+        <File Id='SharpDxDirect2D1DLL' Name='SharpDX.Direct2D1.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.Direct2D1.dll'/>
+        <File Id='SharpDxDirect3D9DLL' Name='SharpDX.Direct3D9.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.Direct3D9.dll'/>
+        <File Id='SharpDxDirect3D11DLL' Name='SharpDX.Direct3D11.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.Direct3D11.dll'/>
+        <File Id='SharpDxDLL' Name='SharpDX.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.dll'/>
+        <File Id='SharpDxDxgiDLL' Name='SharpDX.DXGI.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.DXGI.dll'/>
+        <File Id='SharpDxMediaFoundationDLL' Name='SharpDX.MediaFoundation.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.MediaFoundation.dll'/>  
+        <File Id='SharpDxRawInputDLL' Name='SharpDX.RawInput.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.RawInput.dll'/>
+        <File Id='SharpDxXAudio2DLL' Name='SharpDX.XAudio2.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.XAudio2.dll'/>
+        <File Id='SharpDxXInputDLL' Name='SharpDX.XInput.dll' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\SharpDX.XInput.dll'/>
+      </Component>
+    </ComponentGroup>
+    
+    <ComponentGroup Id="ProductContent">
+      <Component Id="ContentComponent" Guid="efb90483-c257-4255-a5cd-546a26323e14" Directory="Content">
+        <File Id='CityBMP' Name='city.bmp' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\city.bmp' KeyPath='yes'/>
+        <File Id='CharacterPNG' Name='character.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\character.png'/>
+        <File Id='ZombiePNG' Name='zombie.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\zombie.png'/>
+        <File Id='HousePNG' Name='house.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\house.png'/>
+        <File Id='RoadPNG' Name='road.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\road.png'/>
+        <File Id='SteelPNG' Name='steel.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\steel.png'/>
+        <File Id='BasicShaderMGFXO' Name='basicshader.mgfxo' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\basicshader.mgfxo'/>
+      </Component>
+    
+    <Component Id="SpriteSheetComponent" Guid="c933bc85-1949-4053-b1fb-e059101493e2" Directory="SpriteSheets">
+        <File Id='HouseXML' Name='house.xml' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\SpriteSheets\house.xml' KeyPath='yes'/>
+        <File Id='RoadXML' Name='road.xml' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\SpriteSheets\road.xml'/>
+        <File Id='SteelXML' Name='steel.xml' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\SpriteSheets\steel.xml'/>
+      </Component>
+    </ComponentGroup>
+    
+		<Feature Id="Complete" Title="Aftermath" Description='Full game.' Level="1" ConfigurableDirectory='INSTALLFOLDER'>
+			<ComponentGroupRef Id="ProductExecutables" />
+      <ComponentGroupRef Id="ProductContent" />
+		</Feature>
+
+    <UI>
+      <UIRef Id="WixUI_InstallDir" />
+      <Publish Dialog="WelcomeDlg"
+               Control="Next"
+               Event="NewDialog"
+               Value="InstallDirDlg"
+               Order="2">1</Publish>
+      <Publish Dialog="InstallDirDlg"
+               Control="Back"
+               Event="NewDialog"
+               Value="WelcomeDlg"
+               Order="2">1</Publish>
+    </UI>
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+	</Product>
+</Wix>
