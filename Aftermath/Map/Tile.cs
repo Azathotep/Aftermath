@@ -112,5 +112,10 @@ namespace Aftermath.Map
                 return ActionResult.TileBlocked;
             return ActionResult.Ok;
         }
+
+        internal int GetManhattenDistanceFrom(Tile other)
+        {
+            return Math.Abs(other.X - X) + Math.Abs(other.Y - Y);
+        }
     }
 }

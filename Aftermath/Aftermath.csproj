@@ -35,6 +35,10 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Animations\Animation.cs" />
+    <Compile Include="Animations\AnimationManager.cs" />
+    <Compile Include="Animations\BleedAnimation.cs" />
+    <Compile Include="Animations\MuzzleFlashAnimation.cs" />
     <Compile Include="Core\Camera.cs" />
     <Compile Include="Core\Engine.cs" />
     <Compile Include="Core\FovRecursiveShadowcast.cs" />
@@ -44,6 +48,7 @@
     <Compile Include="Creatures\Zombie.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Input\IKeyboardHandler.cs" />
+    <Compile Include="Input\TargetingModule.cs" />
     <Compile Include="Input\XnaKeyboardHandler.cs" />
     <Compile Include="Map\CityBuilder.cs" />
     <Compile Include="Map\WallType.cs" />
@@ -82,10 +87,16 @@
     <Content Include="Content\house.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\road.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\SpriteSheets\house.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\SpriteSheets\overlay.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\SpriteSheets\Road.xml">
@@ -98,6 +109,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\zombie.PNG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\zombie_dead.PNG">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Icon.ico" />

@@ -89,6 +89,11 @@ namespace Aftermath.Rendering
         //    Draw(texture, bounds, depth, 0, Vector2.Zero, Color.White, flipHorizontal);
         //}
 
+        public void Draw(GameTexture texture, RectangleF dest, float depth, float rotation, Vector2F origin, bool flipHorizontal = false)
+        {
+            Draw(texture, dest, depth, rotation, origin, Color.AliceBlue, flipHorizontal);
+        }
+
         public void Draw(GameTexture texture, RectangleF dest, float depth, float rotation, Vector2F origin, Color color, bool flipHorizontal = false)
         {
             Texture2D xnaTexture = _contentManager.Load<Texture2D>(texture.Name);

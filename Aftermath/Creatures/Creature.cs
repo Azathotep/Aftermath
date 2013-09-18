@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Aftermath.Core;
 using Aftermath.Map;
+using Aftermath.Animations;
 
 namespace Aftermath.Creatures
 {
@@ -85,10 +86,11 @@ namespace Aftermath.Creatures
             return ActionResult.Ok;
         }
 
+        //TODO try to make this private. Add actions to drive this method instead
         /// <summary>
         /// Should be called by any action that ends the turn so that the player's turn is ended
         /// </summary>
-        private void EndTurn()
+        public void EndTurn()
         {
             Engine.Instance.TurnSystem.TurnComplete();
         }
@@ -149,6 +151,15 @@ namespace Aftermath.Creatures
             }
         }
 
+        protected bool _isAlive = true;
+        public bool IsAlive
+        {
+            get
+            {
+                return _isAlive;
+            }
+        }
+
         protected int _sightRadius = 15;
 
         /// <summary>
@@ -202,6 +213,19 @@ namespace Aftermath.Creatures
         public abstract Rendering.GameTexture Texture 
         { 
             get;
+        }
+
+        /// <summary>
+        /// Invoke damage on the creature
+        /// </summary>
+        /// <param name="damageAmount">amount of damage</param>
+        internal void PutDamage(int damageAmount)
+        {
+            //TODO add damage type (eg bullet, fire, etc)
+            //TODO find better method name, InduceDamage or CauseDamage or something..
+
+            Engine.Instance.AnimationManager.StartAnimation(new BleedAnimation(this));
+            _isAlive = false;
         }
     }
 

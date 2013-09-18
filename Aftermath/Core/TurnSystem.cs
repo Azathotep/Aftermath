@@ -120,7 +120,8 @@ namespace Aftermath.Core
                 else
                 {
                     //when the actor is not player controlled they are made to move immediately
-                    _currentActor.DoTurn();
+                    if (_currentActor.IsAlive)
+                        _currentActor.DoTurn();
                     _currentActor = null;
                 }
             }

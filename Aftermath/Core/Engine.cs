@@ -8,6 +8,7 @@ using Aftermath.Rendering;
 using Aftermath.Input;
 using Aftermath.Map;
 using Aftermath.Creatures;
+using Aftermath.Animations;
 
 namespace Aftermath.Core
 {
@@ -26,6 +27,8 @@ namespace Aftermath.Core
         TurnSystem _turnSystem;
         Player _player;
         FovRecursiveShadowcast _fov;
+        TargetingModule _targetingModule = new TargetingModule();
+        AnimationManager _animationManager = new AnimationManager();
 
         public Engine(XnaRenderer renderer)
         {
@@ -66,6 +69,45 @@ namespace Aftermath.Core
             }
         }
 
+        enum GameInputState
+        {
+            Movement,
+            Targetting
+        }
+
+        GameInputState _inputState = GameInputState.Movement;
+        GameInputState InputState
+        {
+            get
+            {
+                return _inputState;
+            }
+        }
+
+        TargetingModule Crosshair
+        {
+            get
+            {
+                return _targetingModule;
+            }
+        }
+
+        public TextureManager TextureManager
+        {
+            get
+            {
+                return _textureManager;
+            }
+        }
+
+        public AnimationManager AnimationManager
+        {
+            get
+            {
+                return _animationManager;
+            }
+        }
+
         public void Initialize()
         {
             _world = new World(10, 10);
@@ -75,9 +117,10 @@ namespace Aftermath.Core
             _camera.Position = new Vector2F(5.5f, 5.5f);
             _player = new Player();
             _turnSystem.RegisterCreature(_player);
+            _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
                 Zombie zombie = new Zombie();
                 _turnSystem.RegisterCreature(zombie);
@@ -91,13 +134,16 @@ namespace Aftermath.Core
             _keyboardHandler.RegisterKey(InputKey.S, retriggerInterval: 0);
             _keyboardHandler.RegisterKey(InputKey.D, retriggerInterval: 0);
 
+            _keyboardHandler.RegisterKey(InputKey.F, retriggerInterval: 20);
+
             _keyboardHandler.RegisterKey(InputKey.Left, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Right, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Up, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Down, retriggerInterval: 20);
 
-            _keyboardHandler.RegisterKey(InputKey.Escape, retriggerInterval: 0);
+            _keyboardHandler.RegisterKey(InputKey.Escape, retriggerInterval: 20);
         }
+
 
         void KeyHandler(InputKey key)
         {
@@ -116,30 +162,56 @@ namespace Aftermath.Core
                 case InputKey.D:
                     _camera.Move(cameraSpeed, 0);
                     break;
-                case InputKey.Escape:
-                    if (OnExit != null)
-                        OnExit(this, EventArgs.Empty);
-                    break;
             }
 
-            //TODO if the player holds down two keys then the first key ends the turn and currentactor becomes null
-            //the second key handler then fires but currentactor is now null.
-            //for now put a check that the currentactor isn't null but review this later
-            if (_turnSystem.CurrentActor != null && _turnSystem.CurrentActor.IsPlayerControlled)
+            if (InputState == GameInputState.Movement)
             {
+
+                //TODO if the player holds down two keys then the first key ends the turn and currentactor becomes null
+                //the second key handler then fires but currentactor is now null.
+                //for now put a check that the currentactor isn't null but review this later
+                if (_turnSystem.CurrentActor != null && _turnSystem.CurrentActor.IsPlayerControlled)
+                {
+                    switch (key)
+                    {
+                        case InputKey.Left:
+                            _turnSystem.CurrentActor.Move(CompassDirection.West);
+                            break;
+                        case InputKey.Right:
+                            _turnSystem.CurrentActor.Move(CompassDirection.East);
+                            break;
+                        case InputKey.Up:
+                            _turnSystem.CurrentActor.Move(CompassDirection.North);
+                            break;
+                        case InputKey.Down:
+                            _turnSystem.CurrentActor.Move(CompassDirection.South);
+                            break;
+                        case InputKey.Escape:
+                            if (OnExit != null)
+                                OnExit(this, EventArgs.Empty);
+                            break;
+                        case InputKey.F:
+                            _inputState = GameInputState.Targetting;
+                            _targetingModule.ReaquireTarget(_player);
+                            break;
+                    }
+                }
+            }
+            else if (_inputState == GameInputState.Targetting)
+            {
+                _targetingModule.ProcessKey(key);
                 switch (key)
                 {
-                    case InputKey.Left:
-                        _turnSystem.CurrentActor.Move(CompassDirection.West);
+                    case InputKey.F:
+                        //fire at target
+                        _animationManager.StartAnimation(new MuzzleFlashAnimation(_player));
+                        if (_targetingModule.Tile.Creature != null)
+                            _targetingModule.Tile.Creature.PutDamage(10);
+                        _inputState = GameInputState.Movement;
+                        _player.EndTurn();
                         break;
-                    case InputKey.Right:
-                        _turnSystem.CurrentActor.Move(CompassDirection.East);
-                        break;
-                    case InputKey.Up:
-                        _turnSystem.CurrentActor.Move(CompassDirection.North);
-                        break;
-                    case InputKey.Down:
-                        _turnSystem.CurrentActor.Move(CompassDirection.South);
+                    case InputKey.Escape:
+                        _inputState = GameInputState.Movement;
                         break;
                 }
             }
@@ -281,12 +353,22 @@ namespace Aftermath.Core
                     }
                 }
 
+            if (_inputState == GameInputState.Targetting)
+            {
+                _renderer.Draw(_textureManager.GetTexture("overlay.crosshair"), new RectangleF(_targetingModule.Tile.X, _targetingModule.Tile.Y, 1, 1), 0.5f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
+            }
+
+            foreach (Animation animation in _animationManager.Animations)
+            {
+                animation.Render(_renderer);
+            }
             _renderer.End();
         }
 
         internal void UpdateFrame(GameTime gameTime)
         {
             _keyboardHandler.Update();
+            _animationManager.Update();
             _turnSystem.Update();
         }
     
@@ -295,6 +377,7 @@ namespace Aftermath.Core
             _textureManager.RegisterSpriteSheetTextures("steel");
             _textureManager.RegisterSpriteSheetTextures("road");
             _textureManager.RegisterSpriteSheetTextures("house");
+            _textureManager.RegisterSpriteSheetTextures("overlay");
         }
 
         internal HashSet<Tile> GetFov(int eyeX, int eyeY, int sightRadius)

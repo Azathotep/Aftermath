@@ -17,7 +17,10 @@ namespace Aftermath.Creatures
         {
             get
             {
-                return new GameTexture("zombie", new RectangleI(0, 0, 64, 64));
+                if (IsAlive)
+                    return new GameTexture("zombie", new RectangleI(0, 0, 64, 64));
+                else
+                    return new GameTexture("zombie_dead", new RectangleI(0, 0, 64, 64));
             }
         }
     }
