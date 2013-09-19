@@ -8,9 +8,19 @@ namespace Aftermath.Creatures
 {
     class Zombie : Creature
     {
+        bool _skipNextTurn = false;
         public override void DoTurn()
         {
-            Move(Compass.GetRandomCompassDirection());
+            //skip every other turn, makes zombies slow
+            if (_skipNextTurn)
+            {
+                _skipNextTurn = false;
+                return;
+            }
+            //zombies somehow know where the player is and chase
+            MoveTowards(Aftermath.Core.Engine.Instance.Player.Tile);
+            _skipNextTurn = true;
+            //Move(Compass.GetRandomCompassDirection());
         }
 
         public override GameTexture Texture

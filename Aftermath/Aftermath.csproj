@@ -35,6 +35,11 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AI\Navigation\AStarAlgorithm.cs" />
+    <Compile Include="AI\Navigation\AStarNode.cs" />
+    <Compile Include="AI\Navigation\BinaryHeap.cs" />
+    <Compile Include="AI\Navigation\INavigatableNode.cs" />
+    <Compile Include="AI\Navigation\NavigatableNode.cs" />
     <Compile Include="Animations\Animation.cs" />
     <Compile Include="Animations\AnimationManager.cs" />
     <Compile Include="Animations\BleedAnimation.cs" />

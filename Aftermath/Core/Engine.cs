@@ -108,7 +108,7 @@ namespace Aftermath.Core
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 20; i++)
             {
                 Zombie zombie = new Zombie();
                 _turnSystem.RegisterCreature(zombie);

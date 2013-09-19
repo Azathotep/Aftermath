@@ -234,6 +234,16 @@ namespace Aftermath.Creatures
             _tile.Creature = null;
             _tile.Corpse = this;
         }
+
+        /// <summary>
+        /// Calculates the best path to reach the specified tile and takes the first step
+        /// </summary>
+        public void MoveTowards(Tile tile)
+        {
+            Tile[] tiles = _tile.GetTraversablePath(tile);
+            if (tiles.Length > 1)
+                MoveTo(tiles[1]);
+        }
     }
 
     public enum ActionResult

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Aftermath.Creatures;
+using Aftermath.AI.Navigation;
 
 namespace Aftermath.Map
 {
@@ -134,6 +135,16 @@ namespace Aftermath.Map
         internal int GetManhattenDistanceFrom(Tile other)
         {
             return Math.Abs(other.X - X) + Math.Abs(other.Y - Y);
+        }
+
+        /// <summary>
+        /// Returns a path of tiles from this tile to a target tile
+        /// </summary>
+        public Tile[] GetTraversablePath(Tile target)
+        {
+            AStarAlgorithm astar = new AStarAlgorithm();
+            var path = astar.FindPath(new NavigatableNode(this), new NavigatableNode(target));
+            return (from p in path select ((NavigatableNode)p).Tile).ToArray();
         }
     }
 }
