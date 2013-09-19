@@ -47,6 +47,9 @@
     <Compile Include="Creatures\Player.cs" />
     <Compile Include="Creatures\Zombie.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="State\AimingState.cs" />
+    <Compile Include="State\MovementState.cs" />
+    <Compile Include="State\GameState.cs" />
     <Compile Include="Input\IKeyboardHandler.cs" />
     <Compile Include="Input\TargetingModule.cs" />
     <Compile Include="Input\XnaKeyboardHandler.cs" />

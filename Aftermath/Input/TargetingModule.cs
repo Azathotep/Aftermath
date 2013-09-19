@@ -85,30 +85,5 @@ namespace Aftermath.Input
             _targetedCreature = null;
             _targetedTile = null;
         }
-
-        /// <summary>
-        /// Keys for controlling target module. TODO move this.
-        /// </summary>
-        internal void ProcessKey(InputKey key)
-        {
-            switch (key)
-            {
-                case InputKey.Left:
-                    MoveBy(-1, 0);
-                    break;
-                case InputKey.Right:
-                    MoveBy(1, 0);
-                    break;
-                case InputKey.Up:
-                    MoveBy(0, -1);
-                    break;
-                case InputKey.Down:
-                    MoveBy(0, 1);
-                    break;
-                case InputKey.Escape:
-                    ClearTarget();
-                    break;
-            }
-        }
     }
 }
