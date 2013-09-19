@@ -277,6 +277,12 @@ namespace Aftermath.Core
                     _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
                     if (isVisible)
                     {
+                        //draw corpse first
+                        if (tile.Corpse != null)
+                        {
+                            _renderer.Draw(tile.Corpse.Texture, new RectangleF(x, y, 1, 1), 0.6f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
+                        }
+
                         if (tile.Creature != null)
                         {
                             GameTexture texture = tile.Creature.Texture;

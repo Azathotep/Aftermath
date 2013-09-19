@@ -225,7 +225,14 @@ namespace Aftermath.Creatures
             //TODO find better method name, InduceDamage or CauseDamage or something..
 
             Engine.Instance.AnimationManager.StartAnimation(new BleedAnimation(this));
+            Die();
+        }
+
+        void Die()
+        {
             _isAlive = false;
+            _tile.Creature = null;
+            _tile.Corpse = this;
         }
     }
 

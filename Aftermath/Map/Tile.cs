@@ -23,6 +23,8 @@ namespace Aftermath.Map
         public int Y;
 
         Creature _creature=null;
+        Creature _corpse = null;
+
         /// <summary>
         /// Creature occupying this tile
         /// </summary>
@@ -35,6 +37,22 @@ namespace Aftermath.Map
             set
             {
                 _creature = value;
+            }
+        }
+
+        //TODO only one corpse saved?
+        /// <summary>
+        /// Corpse occupying this tile
+        /// </summary>
+        public Creature Corpse
+        {
+            get
+            {
+                return _corpse;
+            }
+            set
+            {
+                _corpse = value;
             }
         }
 
