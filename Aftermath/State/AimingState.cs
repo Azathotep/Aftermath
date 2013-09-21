@@ -35,12 +35,15 @@ namespace Aftermath.State
                     break;
                 case InputKey.F:
                     //fire at target
-                    //TODO this should all be moved into creature fire or something
-                    Engine.AnimationManager.StartAnimation(new MuzzleFlashAnimation(Engine.Player));
-                    if (targetingModule.Tile.Creature != null)
-                        targetingModule.Tile.Creature.PutDamage(10);
-                    GameState.CurrentState = GameState.MovementState;
-                    Engine.Player.EndTurn();
+                    if (targetingModule.Tile == Engine.Player.Tile)
+                        break;
+                    Engine.Player.FireAt(targetingModule.Tile);
+                    
+                    //GameState.CurrentState = GameState.MovementState;
+                    break;
+                case InputKey.R:
+                    //fire at target
+                    Engine.Player.Reload();
                     break;
             }
         }

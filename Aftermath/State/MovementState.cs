@@ -33,6 +33,9 @@ namespace Aftermath.State
                 case InputKey.Down:
                     Engine.TurnSystem.CurrentActor.Move(CompassDirection.South);
                     break;
+                case InputKey.OemPeriod:
+                    Engine.TurnSystem.CurrentActor.EndTurn();
+                    break;
                 case InputKey.Escape:
                     Engine.Exit();
                     break;
@@ -40,6 +43,9 @@ namespace Aftermath.State
                     //activate aim mode
                     GameState.CurrentState = GameState.AimingState;
                     Engine._targetingModule.ReaquireTarget(Engine.Player);
+                    break;
+                case InputKey.R:
+                    Engine.Player.Reload();
                     break;
             }
         }

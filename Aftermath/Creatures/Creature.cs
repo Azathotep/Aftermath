@@ -35,6 +35,14 @@ namespace Aftermath.Creatures
             }
         }
 
+        void Face(Tile targetTile)
+        {
+            if (_tile != null && targetTile.X < _tile.X)
+                _facingRight = false;
+            else
+                _facingRight = true;
+        }
+
         /// <summary>
         /// Moves the creature from its current tile to a new tile. The operation can fail if
         /// the tile is blocked or already occupied.
@@ -44,11 +52,8 @@ namespace Aftermath.Creatures
         {
             if (targetTile == null)
                 return ActionResult.TileBlocked;
-            //update the facing direction
-            if (_tile != null && targetTile.X < _tile.X)
-                _facingRight = false;
-            else
-                _facingRight = true;
+            //face the attempted direction of movement
+            Face(targetTile);
 
             //check whether the tile allows the creature to enter.
             ActionResult res = targetTile.CanEnter(this);
@@ -215,6 +220,7 @@ namespace Aftermath.Creatures
             get;
         }
 
+        protected int _health = 20;
         /// <summary>
         /// Invoke damage on the creature
         /// </summary>
@@ -225,7 +231,10 @@ namespace Aftermath.Creatures
             //TODO find better method name, InduceDamage or CauseDamage or something..
 
             Engine.Instance.AnimationManager.StartAnimation(new BleedAnimation(this));
-            Die();
+
+            _health -= damageAmount;
+            if (_health <= 0)
+                Die();
         }
 
         void Die()
@@ -243,6 +252,29 @@ namespace Aftermath.Creatures
             Tile[] tiles = _tile.GetTraversablePath(tile);
             if (tiles.Length > 1)
                 MoveTo(tiles[1]);
+        }
+
+        public int LoadedAmmo=6;
+
+        internal void FireAt(Tile targetTile)
+        {
+            if (LoadedAmmo <= 0)
+            {
+                Reload();
+                return;
+            }
+            LoadedAmmo--;
+            Engine.Instance.AnimationManager.StartAnimation(new MuzzleFlashAnimation(this));
+            if (targetTile.Creature != null)
+                targetTile.Creature.PutDamage(10);
+            Face(targetTile);
+            EndTurn();
+        }
+
+        internal void Reload()
+        {
+            LoadedAmmo = 6;
+            EndTurn();
         }
     }
 

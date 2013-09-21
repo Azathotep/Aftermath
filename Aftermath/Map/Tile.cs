@@ -93,6 +93,19 @@ namespace Aftermath.Map
             return GetRelativeTile(offset);
         }
 
+        public List<Tile> GetNeighbours()
+        {
+            List<Tile> ret = new List<Tile>();
+            foreach (CompassDirection direction in Compass.CompassDirections)
+            {
+                Tile n = GetNeighbour(direction);
+                if (n == null)
+                    continue;
+                ret.Add(n);
+            }
+            return ret;
+        }
+
         /// <summary>
         /// Returns the tile at the given offset from this tile
         /// </summary>

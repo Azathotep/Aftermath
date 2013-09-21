@@ -70,6 +70,8 @@ namespace Aftermath.Core
             }
         }
 
+        int _playerCountdown = 0;
+
         List<ITurnInihibitor> _turnInhibitors = new List<ITurnInihibitor>();
 
         /// <summary>
@@ -78,6 +80,13 @@ namespace Aftermath.Core
         /// </summary>
         public void Update()
         {
+            if (_currentActor != null && _currentActor.IsPlayerControlled && _playerCountdown > 0)
+            {
+                _playerCountdown--;
+                if (_playerCountdown <= 0)
+                    _currentActor.EndTurn();
+            }
+
             while (_turns.Count > 0)
             {
                 //wait for current actor to end their turn (almost always the player, as AI controlled actors move immediately)
@@ -112,6 +121,8 @@ namespace Aftermath.Core
 
                 if (_currentActor.IsPlayerControlled)
                 {
+                    Engine.Instance._targetingModule.ReaquireTarget(Engine.Instance.Player);
+                    //_playerCountdown = 50;
                     //The turn number is incremented just prior to the player's turn
                     TurnNumber++;
                     //TODO raise TurnAdvanced event?

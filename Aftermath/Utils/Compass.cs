@@ -75,6 +75,14 @@ namespace Aftermath
                     return new Vector2I(0, 1);
                 case CompassDirection.West:
                     return new Vector2I(-1, 0);
+                case CompassDirection.NorthEast:
+                    return new Vector2I(1, -1);
+                case CompassDirection.NorthWest:
+                    return new Vector2I(-1, -1);
+                case CompassDirection.SouthEast:
+                    return new Vector2I(1, 1);
+                case CompassDirection.SouthWest:
+                    return new Vector2I(-1, 1);
             }
             return new Vector2I(0, 0);
         }

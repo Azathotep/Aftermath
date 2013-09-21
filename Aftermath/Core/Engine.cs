@@ -111,8 +111,14 @@ namespace Aftermath.Core
             for (int i = 0; i < 20; i++)
             {
                 Zombie zombie = new Zombie();
+                Tile tile = _world.GetRandomEmptyTile();
+                if (tile.GetManhattenDistanceFrom(_player.Tile) < 20)
+                {
+                    i--;
+                    continue;
+                }
                 _turnSystem.RegisterCreature(zombie);
-                _world.GetRandomEmptyTile().PlaceCreature(zombie);
+                tile.PlaceCreature(zombie);
             }
 
             _fov = new FovRecursiveShadowcast();
@@ -123,11 +129,13 @@ namespace Aftermath.Core
             _keyboardHandler.RegisterKey(InputKey.D, retriggerInterval: 0);
 
             _keyboardHandler.RegisterKey(InputKey.F, retriggerInterval: 20);
+            _keyboardHandler.RegisterKey(InputKey.R, retriggerInterval: 20);
 
             _keyboardHandler.RegisterKey(InputKey.Left, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Right, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Up, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Down, retriggerInterval: 20);
+            _keyboardHandler.RegisterKey(InputKey.OemPeriod, retriggerInterval: 20);
 
             _keyboardHandler.RegisterKey(InputKey.Escape, retriggerInterval: 20);
         }
@@ -306,6 +314,14 @@ namespace Aftermath.Core
             {
                 animation.Render(_renderer);
             }
+
+            //display bullets
+            //TODO refactor this into UI. Fix positioning.
+            for (int x = 0; x < _player.LoadedAmmo; x++)
+            {
+                Vector2 world = _renderer.ScreenToWorld(0.01f, 0.02f);
+                _renderer.Draw(new GameTexture("bullet", new RectangleI(0, 0, 32, 32)), new RectangleF(world.X+ x * 0.5f, world.Y, 1, 1), 0.2f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
+            }
             _renderer.End();
         }
 
@@ -340,6 +356,14 @@ namespace Aftermath.Core
             get
             {
                 return _player;
+            }
+        }
+
+        public World World 
+        {
+            get
+            {
+                return _world;
             }
         }
     }
