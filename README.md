@@ -1,4 +1,4 @@
-Aftermath v0.0.1
+Aftermath v0.0.2
 ============
 
 A [Roguelike](http://roguebasin.roguelikedevelopment.org/index.php?title=Berlin_Interpretation) zombie survival game
@@ -8,7 +8,7 @@ For the latest release (msi installer) [see the releases page](https://github.co
 
 -----
 
-![Screenshot](https://github.com/Azathotep/Aftermath/raw/master//Images/screenshot1.png)
+![Screenshot](https://github.com/Azathotep/Aftermath/raw/master//Images/screenshot_v0_0_2.png)
 
 The city has been overrun by zombies! You are one of the few survivors.
 
