@@ -203,7 +203,6 @@ namespace Aftermath.Core
 
             //set the camera position to center on the player
             _camera.Position = new Vector2F(_player.Location.X * 1, _player.Location.Y * 1);
-            _renderer.SetView(_camera.Position);
 
             //calculate the number of tiles that can fit on the screen both vertically and horizontally
             //TODO test this works and move it out, only need to calculate when the resolution or zoom changes,

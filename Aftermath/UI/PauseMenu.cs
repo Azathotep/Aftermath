@@ -26,11 +26,11 @@ namespace Aftermath.UI
             switch (key)
             {
                 case InputKey.Up:
-                case InputKey.Right:
+                case InputKey.Left:
                     _selectedItem = Math.Max(_selectedItem - 1, 0);
                     break;
                 case InputKey.Down:
-                case InputKey.Left:
+                case InputKey.Right:
                     _selectedItem = Math.Min(_selectedItem + 1, 1);
                     break;
                 case InputKey.Escape:

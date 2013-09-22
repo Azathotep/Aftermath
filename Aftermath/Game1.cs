@@ -1,6 +1,7 @@
 ﻿#region Using Statements
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -26,9 +27,8 @@ namespace Aftermath
             : base()
         {
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.PreferredBackBufferWidth = 1024;
-            _graphics.PreferredBackBufferHeight = 768;
-            _graphics.IsFullScreen = false;
+            _renderer = new XnaRenderer(_graphics, Content, Window);
+            _renderer.SetDeviceMode(800, 600, false);
             Content.RootDirectory = "Content";
         }
 
@@ -40,8 +40,7 @@ namespace Aftermath
         /// </summary>
         protected override void Initialize()
         {
-            _renderer = new XnaRenderer(_graphics, Content);
-            _renderer.SetDeviceMode(800, 600, true);
+            _renderer.Initialize();
             _engine = new Engine(_renderer);
             _engine.Initialize();
             _engine.OnExit += new EventHandler(_engine_OnExit);

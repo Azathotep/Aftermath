@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Forms;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,44 +16,24 @@ namespace Aftermath.Rendering
     {
         GraphicsDeviceManager _deviceManager;
         ContentManager _contentManager;
-        Matrix _world;
-        Matrix _view;
-        Matrix _projection;
         Matrix _worldViewProjection;
         SpriteBatch _spriteBatch;
+        GameWindow _window;
 
-        public XnaRenderer(GraphicsDeviceManager deviceManager, ContentManager contentManager)
+        public XnaRenderer(GraphicsDeviceManager deviceManager, ContentManager contentManager, GameWindow window)
         {
             _deviceManager = deviceManager;
             _contentManager = contentManager;
-
-            _spriteBatch = new SpriteBatch(deviceManager.GraphicsDevice);
-
-            int tilesX = 30; // 40; // 40;
-            int tilesY = 24; // 32; // 32;
-
-            //int tilesX = 20;
-            //int tilesY = 16;
-
-            //TODO arrghh refactor this
-            //Vector2 lookAt = new Vector2(device.Viewport.Width * 0.5f, device.Viewport.Height * 0.5f);
-            //_view = Matrix.CreateLookAt(new Vector3(lookAt, 0), new Vector3(lookAt, 10), new Vector3(0, -1, 0));
-            _projection = Matrix.CreateOrthographic(tilesX, tilesY, -1000.5f, 100); //40, 32, -100.5f, 100); //_device.Viewport.Width, _device.Viewport.Height, -1000.5f, 100);
-            _world = Matrix.CreateScale(1f);
-
-            //the ratio of the world screen width to the view screen width
-            //_worldScreenScale.X = tilesX / (float)ViewWidth;
-            //_worldScreenScale.Y = tilesY / (float)ViewHeight;
-            //PresentationParameters pp = device.PresentationParameters;
-            //_mainRenderTarget = new RenderTarget2D(device, pp.BackBufferWidth, pp.BackBufferHeight, false, pp.BackBufferFormat, pp.DepthStencilFormat);
-            //_normalRenderTarget = new RenderTarget2D(device, pp.BackBufferWidth, pp.BackBufferHeight, false, pp.BackBufferFormat, pp.DepthStencilFormat);
-        
-            _font = _contentManager.Load<SpriteFont>("Font");
+            _window = window;
         }
 
         SpriteFont _font;
 
-
+        public void Initialize()
+        {
+            _spriteBatch = new SpriteBatch(_deviceManager.GraphicsDevice);
+            _font = _contentManager.Load<SpriteFont>("Font");
+        }
 
         static Color ClearColor = new Color(50, 50, 50);
         public void Clear()
@@ -63,9 +44,29 @@ namespace Aftermath.Rendering
 
         public void SetDeviceMode(int width, int height, bool fullscreen)
         {
-            _deviceManager.PreferredBackBufferWidth = width;
-            _deviceManager.PreferredBackBufferHeight = height;
-            _deviceManager.IsFullScreen = fullscreen;
+            //fullscreen in windows is not implemented in monogame
+            //_deviceManager.IsFullScreen = fullscreen
+            //alternative is to use a borderless window and resize
+            //downside is that the resolution of the fullscreen window is fixed to the screen resolution
+            //and cannot be changed
+            if (fullscreen)
+            {
+                _window.IsBorderless = true;
+                _deviceManager.PreferredBackBufferWidth = Screen.PrimaryScreen.Bounds.Width;
+                _deviceManager.PreferredBackBufferHeight = Screen.PrimaryScreen.Bounds.Height;
+                _window.Position = Point.Zero;
+                _deviceManager.IsFullScreen = true;
+                
+            }
+            else
+            {
+                _window.IsBorderless = false;
+                _deviceManager.PreferredBackBufferWidth = width;
+                _deviceManager.PreferredBackBufferHeight = height;
+                _window.Position = new Point(Screen.PrimaryScreen.Bounds.Width / 2 - width / 2,
+                                             Screen.PrimaryScreen.Bounds.Height / 2 - height / 2);
+            }
+            _deviceManager.ApplyChanges();
         }
 
         public void Begin(Matrix world, Matrix projection, Matrix view)
@@ -77,32 +78,11 @@ namespace Aftermath.Rendering
             _spriteBatch.Begin(SpriteSortMode.BackToFront, null, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect, Matrix.CreateScale(1));
         }
 
-        public void Begin()
-        {
-            //TODO refactor??
-            Effect effect = _contentManager.Load<Effect>("basicshader.mgfxo");
-            effect.Parameters["xWorld"].SetValue(_world);
-            effect.Parameters["xProjection"].SetValue(_projection);
-            effect.Parameters["xView"].SetValue(_view);
-            _spriteBatch.Begin(SpriteSortMode.BackToFront, null, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect, Matrix.CreateScale(1));
-        }
-
         public void End()
         {
             _spriteBatch.End();
         }
 
-        internal void SetView(Vector2F cameraLook)
-        {
-            Vector2 lookAt = new Vector2(cameraLook.X, cameraLook.Y);
-            _view = Matrix.CreateLookAt(new Vector3(lookAt, -1), new Vector3(lookAt, 0), new Vector3(0, -1, 0));
-            _worldViewProjection = _world * _view * _projection;
-        }
-
-        //public void Draw(TextureRef texture, RectangleF bounds, float depth, bool flipHorizontal = false)
-        //{
-        //    Draw(texture, bounds, depth, 0, Vector2.Zero, Color.White, flipHorizontal);
-        //}
 
         public void Draw(GameTexture texture, RectangleF dest, float depth, float rotation, Vector2F origin, bool flipHorizontal = false)
         {
