@@ -52,7 +52,7 @@ namespace Aftermath.Creatures
             //Move(Compass.GetRandomCompassDirection());
         }
 
-        //hello
+        //hello  //hello BACK!!!
 
         bool IsFood(Creature other)
         {
