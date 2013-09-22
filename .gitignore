@@ -1,0 +1,9 @@
+*.suo
+
+Debug
+
+UpgradeLog.XML
+
+*.htm
+
+_UpgradeReport_Files

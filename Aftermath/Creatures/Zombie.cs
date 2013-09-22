@@ -6,6 +6,7 @@ using Aftermath.Rendering;
 using Aftermath.AI;
 using Aftermath.Core;
 using Aftermath.Map;
+using Aftermath.Utils;
 
 namespace Aftermath.Creatures
 {

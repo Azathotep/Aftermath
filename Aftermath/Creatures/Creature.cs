@@ -5,6 +5,7 @@ using System.Text;
 using Aftermath.Core;
 using Aftermath.Map;
 using Aftermath.Animations;
+using Aftermath.Utils;
 
 namespace Aftermath.Creatures
 {
