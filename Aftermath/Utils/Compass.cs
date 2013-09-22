@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Aftermath
+﻿namespace Aftermath.Utils
 {
     /// <summary>
     /// Provides operations for compass directions

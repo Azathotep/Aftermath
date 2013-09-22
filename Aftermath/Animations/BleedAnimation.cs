@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Aftermath.Utils;
 using Microsoft.Xna.Framework;
 using Aftermath.Creatures;
 using Aftermath.Map;

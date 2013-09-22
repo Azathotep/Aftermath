@@ -83,7 +83,7 @@
   <ItemGroup>
     <Reference Include="MonoGame.Framework, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\MonoGame\MonoGame.Framework\bin\Windows\Debug\MonoGame.Framework.dll</HintPath>
+      <HintPath>..\..\..\..\..\Program Files (x86)\MonoGame\v3.2\Assemblies\Windows\MonoGame.Framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
