@@ -120,7 +120,7 @@ namespace Aftermath.Core
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 200; i++)
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();

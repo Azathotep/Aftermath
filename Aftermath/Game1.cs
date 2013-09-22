@@ -28,7 +28,8 @@ namespace Aftermath
         {
             _graphics = new GraphicsDeviceManager(this);
             _renderer = new XnaRenderer(_graphics, Content, Window);
-            _renderer.SetDeviceMode(800, 600, false);
+            _renderer.SetDeviceMode(800, 600, false); //(1024, 768, false);
+            
             Content.RootDirectory = "Content";
         }
 

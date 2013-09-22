@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-	<Product Id="cd1ea433-d973-445a-afc3-ce7fb5c75de1" Name="Aftermath v0.01" Language="1033" Version="0.0.1.0" Manufacturer="NA" UpgradeCode="c9c4e79d-66cd-434f-af39-d79ec22a6675">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Description="Aftermath v0.01 Installer" />
+	<Product Id="cd1ea433-d973-445a-afc3-ce7fb5c75de1" Name="Aftermath v0.02" Language="1033" Version="0.0.2.0" Manufacturer="NA" UpgradeCode="c9c4e79d-66cd-434f-af39-d79ec22a6675">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Description="Aftermath v0.02 Installer" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<Media Id='1' Cabinet='Data.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1' />
@@ -37,17 +37,24 @@
     
     <ComponentGroup Id="ProductContent">
       <Component Id="ContentComponent" Guid="efb90483-c257-4255-a5cd-546a26323e14" Directory="Content">
-        <File Id='CityBMP' Name='city.bmp' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\city.bmp' KeyPath='yes'/>
+        <File Id='BasicShaderMGFXO' Name='basicshader.mgfxo' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\basicshader.mgfxo'/>
+        <File Id='BulletPNG' Name='bullet.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\bullet.png' KeyPath='yes'/>
         <File Id='CharacterPNG' Name='character.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\character.png'/>
-        <File Id='ZombiePNG' Name='zombie.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\zombie.png'/>
+        <File Id='CityBMP' Name='city.bmp' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\city.bmp'/>
+        <File Id='FontXNB' Name='Font.xnb' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\Font.xnb'/>
         <File Id='HousePNG' Name='house.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\house.png'/>
+        <File Id='OverlayPNG' Name='overlay.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\overlay.png'/>
+        <File Id='pauseMenuPNG' Name='pausemenu.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\pausemenu.png'/>
         <File Id='RoadPNG' Name='road.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\road.png'/>
         <File Id='SteelPNG' Name='steel.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\steel.png'/>
-        <File Id='BasicShaderMGFXO' Name='basicshader.mgfxo' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\basicshader.mgfxo'/>
+        <File Id='ZombiePNG' Name='zombie.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\zombie.png'/>
+        <File Id='Zombie_deadPNG' Name='zombie_dead.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\zombie_dead.png'/>
+        <File Id='ZombieInjuredPNG' Name='zombieInjured.png' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\zombieInjured.png'/>        
       </Component>
     
     <Component Id="SpriteSheetComponent" Guid="c933bc85-1949-4053-b1fb-e059101493e2" Directory="SpriteSheets">
         <File Id='HouseXML' Name='house.xml' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\SpriteSheets\house.xml' KeyPath='yes'/>
+        <File Id='OverlayXML' Name='overlay.xml' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\SpriteSheets\overlay.xml'/>
         <File Id='RoadXML' Name='road.xml' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\SpriteSheets\road.xml'/>
         <File Id='SteelXML' Name='steel.xml' DiskId='1' Source='..\Aftermath\bin\Windows\$(var.Configuration)\Content\SpriteSheets\steel.xml'/>
       </Component>

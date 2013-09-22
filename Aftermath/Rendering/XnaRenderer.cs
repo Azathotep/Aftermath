@@ -61,10 +61,13 @@ namespace Aftermath.Rendering
             else
             {
                 _window.IsBorderless = false;
-                _deviceManager.PreferredBackBufferWidth = width;
-                _deviceManager.PreferredBackBufferHeight = height;
+                //Strange, when NOT running under the debugger changing the Position of the Window causes the OnClientSizeChanged
+                //event to be raised which monogame catches and resets the backbufferwidth and height. So need to set position here first.
                 _window.Position = new Point(Screen.PrimaryScreen.Bounds.Width / 2 - width / 2,
                                              Screen.PrimaryScreen.Bounds.Height / 2 - height / 2);
+                _deviceManager.PreferredBackBufferWidth = width;
+                _deviceManager.PreferredBackBufferHeight = height;
+                
             }
             _deviceManager.ApplyChanges();
         }
