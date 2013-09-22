@@ -20,7 +20,7 @@ namespace Aftermath.Creatures
         {
             if (Engine.Instance.TurnSystem.TurnNumber != playermap_generatedTime)
             {
-                playermap = new HomingField(Engine.Instance.World, 20, 20); //50, 50);
+                playermap = new HomingField(Engine.Instance.World, 30, 30); //50, 50);
                 playermap.CenterOn(Engine.Instance.Player.Location);
                 playermap.SetHomingTarget(Engine.Instance.Player.Location);
                 playermap.Generate();
@@ -48,9 +48,11 @@ namespace Aftermath.Creatures
                 Move(Compass.GetRandomCompassDirection());
             //zombies somehow know where the player is and chase
             //MoveTowards(Aftermath.Core.Engine.Instance.Player.Tile);
-            _skipNextTurn = true;
+            //_skipNextTurn = true;
             //Move(Compass.GetRandomCompassDirection());
         }
+
+        //hello
 
         bool IsFood(Creature other)
         {
