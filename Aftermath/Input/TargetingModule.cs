@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Aftermath.Map;
 using Aftermath.Creatures;
+using Aftermath.Utils;
 
 namespace Aftermath.Input
 {

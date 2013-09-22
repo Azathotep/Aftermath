@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Aftermath.Map;
+using Aftermath.Utils;
 
 namespace Aftermath.AI.Navigation
 {
