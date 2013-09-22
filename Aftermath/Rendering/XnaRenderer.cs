@@ -46,7 +46,13 @@ namespace Aftermath.Rendering
             //PresentationParameters pp = device.PresentationParameters;
             //_mainRenderTarget = new RenderTarget2D(device, pp.BackBufferWidth, pp.BackBufferHeight, false, pp.BackBufferFormat, pp.DepthStencilFormat);
             //_normalRenderTarget = new RenderTarget2D(device, pp.BackBufferWidth, pp.BackBufferHeight, false, pp.BackBufferFormat, pp.DepthStencilFormat);
+        
+            _font = _contentManager.Load<SpriteFont>("Font");
         }
+
+        SpriteFont _font;
+
+
 
         static Color ClearColor = new Color(50, 50, 50);
         public void Clear()
@@ -60,6 +66,15 @@ namespace Aftermath.Rendering
             _deviceManager.PreferredBackBufferWidth = width;
             _deviceManager.PreferredBackBufferHeight = height;
             _deviceManager.IsFullScreen = fullscreen;
+        }
+
+        public void Begin(Matrix world, Matrix projection, Matrix view)
+        {
+            Effect effect = _contentManager.Load<Effect>("basicshader.mgfxo");
+            effect.Parameters["xWorld"].SetValue(world);
+            effect.Parameters["xProjection"].SetValue(projection);
+            effect.Parameters["xView"].SetValue(view);
+            _spriteBatch.Begin(SpriteSortMode.BackToFront, null, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullCounterClockwise, effect, Matrix.CreateScale(1));
         }
 
         public void Begin()
@@ -130,6 +145,47 @@ namespace Aftermath.Rendering
             y = ((1 - y) * 2 - 1);
             Vector2 ret = Vector2.Transform(new Vector2(x, y), Matrix.Invert(_worldViewProjection));
             return ret;
+        }
+
+        public Vector2 MeasureString(string text)
+        {
+            return _font.MeasureString(text);
+        }
+
+        public RectangleF DrawStringBox(string text, RectangleF bounds, Color color, bool rightAlign = false)
+        {
+            float screenWidth = bounds.Width; //ViewWidth;
+            float screenHeight = bounds.Height; //ViewHeight;
+            string[] words = text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            string drawString = "";
+            string lineSoFar = "";
+            string linePlusWord = "";
+            foreach (string word in words)
+            {
+                if (lineSoFar.Length > 0)
+                    linePlusWord += " ";
+                linePlusWord += word;
+                Vector2 newSize = _font.MeasureString(linePlusWord);
+                if (newSize.X >= screenWidth)
+                {
+                    drawString += lineSoFar + Environment.NewLine;
+                    lineSoFar = word;
+                    linePlusWord = lineSoFar;
+                }
+                else
+                    lineSoFar = linePlusWord;
+            }
+            if (lineSoFar.Length > 0)
+                drawString += lineSoFar;
+
+            //Vector2 worldPos = ScreenToWorld(bounds.X, bounds.Y);
+            Vector2 worldPos = new Vector2(bounds.X, bounds.Y);
+            float _worldScreenScale = 1f;
+            _spriteBatch.DrawString(_font, drawString, worldPos, color, 0, Vector2.Zero, _worldScreenScale, SpriteEffects.None, 0.1f);
+
+            //bounds.Width = width;
+            //bounds.Height = height;
+            return bounds;
         }
     }
 }

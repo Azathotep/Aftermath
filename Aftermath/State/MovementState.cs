@@ -37,7 +37,8 @@ namespace Aftermath.State
                     Engine.TurnSystem.CurrentActor.EndTurn();
                     break;
                 case InputKey.Escape:
-                    Engine.Exit();
+                    GameState.CurrentState = GameState.GamePausedState;
+                    //Engine.Exit();
                     break;
                 case InputKey.F:
                     //activate aim mode

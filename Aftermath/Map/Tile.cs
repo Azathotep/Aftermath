@@ -120,7 +120,7 @@ namespace Aftermath.Map
         /// </summary>
         public void PlaceCreature(Creature creature)
         {
-            if (creature.Tile != null)
+            if (creature.Location != null)
                 throw new Exception("Creature cannot be placed as it is already placed on a map");
             creature.Place(this);
         }

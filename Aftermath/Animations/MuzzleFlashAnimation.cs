@@ -32,10 +32,10 @@ namespace Aftermath.Animations
         public override void Render(XnaRenderer renderer)
         {
             float width = 0.5f;
-            float x = _firer.Tile.X + 0.4f;
+            float x = _firer.Location.X + 0.4f;
             if (!_firer.FacingRight)
-                x = _firer.Tile.X - 0.4f;
-            renderer.Draw(Engine.Instance.TextureManager.GetTexture("overlay.fireball"), new RectangleF(x, _firer.Tile.Y - 0.1f, width, width), 0.2f, 0, new Vector2F(0.5f, 0.5f));
+                x = _firer.Location.X - 0.4f;
+            renderer.Draw(Engine.Instance.TextureManager.GetTexture("overlay.fireball"), new RectangleF(x, _firer.Location.Y - 0.1f, width, width), 0.2f, 0, new Vector2F(0.5f, 0.5f));
         }
     }
 }

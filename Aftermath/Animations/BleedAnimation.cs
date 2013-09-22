@@ -33,7 +33,7 @@ namespace Aftermath.Animations
         public override void Render(XnaRenderer renderer)
         {
             float width = (float)_lifetime / 15;
-            renderer.Draw(Engine.Instance.TextureManager.GetTexture("overlay.blood"), new RectangleF(_creature.Tile.X, _creature.Tile.Y, width, width), 0.2f, 0, new Vector2F(0.5f, 0.5f), new Color(1, 1, 1, 0.8f));
+            renderer.Draw(Engine.Instance.TextureManager.GetTexture("overlay.blood"), new RectangleF(_creature.Location.X, _creature.Location.Y, width, width), 0.2f, 0, new Vector2F(0.5f, 0.5f), new Color(1, 1, 1, 0.8f));
         }
     }
 }

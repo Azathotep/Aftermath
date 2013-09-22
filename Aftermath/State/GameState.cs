@@ -17,11 +17,42 @@ namespace Aftermath.State
     {
         public static GameState MovementState = new MovementState();
         public static GameState AimingState = new AimingState();
+        public static GameState GameOverState = new GameOverState();
+        public static GameState GamePausedState = new GamePausedState();
+
+        static GameState _currentState = GameState.MovementState;
 
         /// <summary>
         /// Returns or sets the current game state. Should be set to one of the static instances above.
         /// </summary>
-        public static GameState CurrentState = MovementState;
+        public static GameState CurrentState
+        {
+            get
+            {
+                return _currentState;
+            }
+            set
+            {
+                _currentState.OnSwitchAway();
+                _currentState = value;
+                _currentState.OnSwitchTo();
+            }
+        }
+
+        /// <summary>
+        /// Called when the game switches away from this state. Can be overriden to
+        /// provide initialization.
+        /// </summary>
+        protected virtual void OnSwitchAway()
+        {
+        }
+
+        /// <summary>
+        /// Called when the game switched to this state
+        /// </summary>
+        protected virtual void OnSwitchTo()
+        {
+        }
 
         /// <summary>
         /// Tells the game state to handle a keypress
@@ -35,6 +66,5 @@ namespace Aftermath.State
                 return Engine.Instance;
             }
         }
-
     }
 }

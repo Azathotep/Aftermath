@@ -54,6 +54,8 @@
     <Compile Include="Creatures\Zombie.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="State\AimingState.cs" />
+    <Compile Include="State\GamePausedState.cs" />
+    <Compile Include="State\GameOverState.cs" />
     <Compile Include="State\MovementState.cs" />
     <Compile Include="State\GameState.cs" />
     <Compile Include="Input\IKeyboardHandler.cs" />
@@ -68,6 +70,9 @@
     <Compile Include="Rendering\SpriteSheet.cs" />
     <Compile Include="Rendering\TextureManager.cs" />
     <Compile Include="Rendering\XnaRenderer.cs" />
+    <Compile Include="UI\PauseMenu.cs" />
+    <Compile Include="UI\Menu.cs" />
+    <Compile Include="UI\UIManager.cs" />
     <Compile Include="Utils\Compass.cs" />
     <Compile Include="Utils\Dice.cs" />
     <Compile Include="Utils\RectangleF.cs" />
@@ -100,6 +105,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\overlay.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\pausemenu.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\road.png">
@@ -135,6 +143,11 @@
     <Content Include="Content\basicshader.mgfxo">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Content\Font.xnb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

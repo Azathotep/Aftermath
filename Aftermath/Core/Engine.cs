@@ -10,6 +10,7 @@ using Aftermath.Map;
 using Aftermath.Creatures;
 using Aftermath.Animations;
 using Aftermath.State;
+using Aftermath.UI;
 
 namespace Aftermath.Core
 {
@@ -33,6 +34,8 @@ namespace Aftermath.Core
         public TargetingModule _targetingModule = new TargetingModule();
         AnimationManager _animationManager = new AnimationManager();
 
+        UIManager _uiManager = new UIManager();
+
         public Engine(XnaRenderer renderer)
         {
             _instance = this;
@@ -41,6 +44,7 @@ namespace Aftermath.Core
             _keyboardHandler = new XnaKeyboardHandler(KeyHandler);
             _camera = new Camera();
             _turnSystem = new TurnSystem();
+            _uiManager.RegisterMenu("PauseMenu", new PauseMenu());
         }
 
         static Engine _instance;
@@ -61,6 +65,14 @@ namespace Aftermath.Core
             get
             {
                 return _fov;
+            }
+        }
+
+        public UIManager UIManager
+        {
+            get
+            {
+                return _uiManager;
             }
         }
 
@@ -108,11 +120,11 @@ namespace Aftermath.Core
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 4; i++)
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();
-                if (tile.GetManhattenDistanceFrom(_player.Tile) < 20)
+                if (tile.GetManhattenDistanceFrom(_player.Location) < 20)
                 {
                     i--;
                     continue;
@@ -138,6 +150,7 @@ namespace Aftermath.Core
             _keyboardHandler.RegisterKey(InputKey.OemPeriod, retriggerInterval: 20);
 
             _keyboardHandler.RegisterKey(InputKey.Escape, retriggerInterval: 20);
+            _keyboardHandler.RegisterKey(InputKey.Enter, retriggerInterval: 20);
         }
 
 
@@ -169,6 +182,8 @@ namespace Aftermath.Core
         HashSet<Tile> _playerSeenTiles = new HashSet<Tile>();
         int _playerLastVisibleFilesFetchTime;
 
+        float _zoomAmt = 0;
+
         public void DrawFrame(GameTime gameTime)
         {
             _renderer.Clear();
@@ -187,7 +202,7 @@ namespace Aftermath.Core
             }
 
             //set the camera position to center on the player
-            _camera.Position = new Vector2F(_player.X * 1, _player.Y * 1);
+            _camera.Position = new Vector2F(_player.Location.X * 1, _player.Location.Y * 1);
             _renderer.SetView(_camera.Position);
 
             //calculate the number of tiles that can fit on the screen both vertically and horizontally
@@ -197,7 +212,19 @@ namespace Aftermath.Core
             Vector2 bottomRight = _renderer.ScreenToWorld(1, 1);
             Rectangle tileRangeToDraw = new Rectangle((int)topLeft.X - 1, (int)topLeft.Y - 1, (int)bottomRight.X - (int)topLeft.X + 2, (int)bottomRight.Y - (int)topLeft.Y + 2);
 
-            _renderer.Begin();
+            Matrix world = Matrix.Identity;
+            Matrix projection = Matrix.CreateOrthographic(30, 24, -1000.5f, 100);
+            if (!Engine.Instance.Player.IsAlive)
+            {
+                projection = Matrix.CreateOrthographic(30 - 15 * _zoomAmt, 24 - 12 * _zoomAmt, -1000.5f, 100);
+                if (_zoomAmt < 1.5f)
+                    _zoomAmt += 0.1f;
+            }
+
+            Vector2 lookAt = new Vector2(_camera.Position.X, _camera.Position.Y);
+            Matrix view = Matrix.CreateLookAt(new Vector3(lookAt, -1), new Vector3(lookAt, 0), new Vector3(0, -1, 0));
+            
+            _renderer.Begin(world, projection, view);
 
             //int width=20;
             //int height = 14;
@@ -314,14 +341,35 @@ namespace Aftermath.Core
             {
                 animation.Render(_renderer);
             }
+            _renderer.End();
+
+            //Beginning of UI
+            //TODO refactor
+
+            world = Matrix.CreateScale(1f);
+            //Matrix projection = Matrix.CreateOrthographic(1024, 768, -1000.5f, 500);
+            //Matrix view = Matrix.CreateLookAt(new Vector3(512, 384, -100), new Vector3(512, 384, 0), new Vector3(0, -1, 0));
+            projection = Matrix.CreateOrthographic(800, 600, -1000.5f, 500);
+            view = Matrix.CreateLookAt(new Vector3(400, 300, -1), new Vector3(400, 300, 0), new Vector3(0, -1, 0));
+
+            _renderer.Begin(world, projection, view);
 
             //display bullets
-            //TODO refactor this into UI. Fix positioning.
             for (int x = 0; x < _player.LoadedAmmo; x++)
             {
-                Vector2 world = _renderer.ScreenToWorld(0.01f, 0.02f);
-                _renderer.Draw(new GameTexture("bullet", new RectangleI(0, 0, 32, 32)), new RectangleF(world.X+ x * 0.5f, world.Y, 1, 1), 0.2f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
+                _renderer.Draw(new GameTexture("bullet", new RectangleI(0, 0, 32, 32)), new RectangleF(0 + x * 16, 0, 32, 32), 0.2f, 0, new Vector2F(0f, 0f), Color.AliceBlue);
             }
+
+            _renderer.DrawStringBox("Ammo: " + _player.LoadedAmmo, new RectangleF(200, 10, 550, 50), Color.White);
+
+            if (!Engine.Instance.Player.IsAlive)
+            {
+                _renderer.DrawStringBox("You have been eaten by a zombie. Press Esc to exit.", new RectangleF(300, 250, 200, 100), Color.Black);
+                _renderer.DrawStringBox("You have been eaten by a zombie. Press Esc to exit.", new RectangleF(301, 251, 200, 100), Color.White);
+            }
+
+            _uiManager.RenderUI(_renderer);
+            
             _renderer.End();
         }
 

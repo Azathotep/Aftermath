@@ -5,6 +5,7 @@ using System.Text;
 using Aftermath.Rendering;
 using Aftermath.AI;
 using Aftermath.Core;
+using Aftermath.Map;
 
 namespace Aftermath.Creatures
 {
@@ -18,9 +19,9 @@ namespace Aftermath.Creatures
         {
             if (Engine.Instance.TurnSystem.TurnNumber != playermap_generatedTime)
             {
-                playermap = new HomingField(Engine.Instance.World, 50, 50);
-                playermap.CenterOn(Engine.Instance.Player.Tile);
-                playermap.SetHomingTarget(Engine.Instance.Player.Tile);
+                playermap = new HomingField(Engine.Instance.World, 20, 20); //50, 50);
+                playermap.CenterOn(Engine.Instance.Player.Location);
+                playermap.SetHomingTarget(Engine.Instance.Player.Location);
                 playermap.Generate();
                 playermap_generatedTime = Engine.Instance.TurnSystem.TurnNumber;
             }
@@ -32,15 +33,40 @@ namespace Aftermath.Creatures
                 return;
             }
 
-            Map.Tile next = playermap.GetNext(Tile);
+            Tile next = playermap.GetNext(Location);
             if (next != null)
-                MoveTo(next);
+            {
+                if (next.Creature != null && IsFood(next.Creature))
+                {
+                    Bite(next);
+                }
+                else
+                    MoveTo(next);
+            }
             else
                 Move(Compass.GetRandomCompassDirection());
             //zombies somehow know where the player is and chase
             //MoveTowards(Aftermath.Core.Engine.Instance.Player.Tile);
             _skipNextTurn = true;
             //Move(Compass.GetRandomCompassDirection());
+        }
+
+        bool IsFood(Creature other)
+        {
+            if (other == Engine.Instance.Player)
+                return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Bite whatever is in the tile
+        /// </summary>
+        void Bite(Tile tile)
+        {
+            if (tile.Creature == null)
+                return;
+            tile.Creature.PutDamage(10);
+            EndTurn();
         }
 
         public override GameTexture Texture

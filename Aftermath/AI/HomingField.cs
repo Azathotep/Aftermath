@@ -116,9 +116,9 @@ namespace Aftermath.AI
         /// <returns></returns>
         public Tile GetNext(Tile tile)
         {
-            //find a neighbour that has a lower field numnber that the specified tile
+            //find a neighbour that has a lower field number that the specified tile
             int currentValue = GetDistanceToNearestTarget(tile);
-            return (from n in tile.GetNeighbours() where n.Creature == null && GetDistanceToNearestTarget(n) < currentValue select n).FirstOrDefault();
+            return (from n in tile.GetNeighbours() where GetDistanceToNearestTarget(n) < currentValue select n).FirstOrDefault();
         }
 
         /// <summary>

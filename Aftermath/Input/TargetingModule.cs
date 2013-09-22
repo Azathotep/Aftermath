@@ -28,7 +28,7 @@ namespace Aftermath.Input
             get
             {
                 if (_targetedCreature != null)
-                    return _targetedCreature.Tile;
+                    return _targetedCreature.Location;
                 return _targetedTile;
             }
         }
@@ -64,12 +64,12 @@ namespace Aftermath.Input
 
             //module has no target or an invalid target so aquire a new target
             //go for the nearest living creature
-            Creature nearestTarget = (from c in visibleCreatures where c.IsAlive orderby c.Tile.GetManhattenDistanceFrom(targeter.Tile) select c).FirstOrDefault();
+            Creature nearestTarget = (from c in visibleCreatures where c.IsAlive orderby c.Location.GetManhattenDistanceFrom(targeter.Location) select c).FirstOrDefault();
             if (nearestTarget == null)
             {
                 //no available target so reset crosshair to owner's tile
-                _targetedTile = targeter.Tile;
-                _targetedCreature = null;
+                _targetedTile = null;
+                _targetedCreature = targeter;
             }
             else
             {

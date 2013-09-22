@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Aftermath.Creatures;
+using Aftermath.State;
 
 namespace Aftermath.Core
 {
@@ -98,6 +99,12 @@ namespace Aftermath.Core
                     if (inhibitor.IsBlocking)
                         return;
 
+                //TODO move this
+                if (Engine.Instance.Player.IsAlive == false)
+                {
+                    GameState.CurrentState = GameState.GameOverState;
+                }
+
                 //increment the minor turn number each time an actor has moved
                 _minorTurnNumber++;
                 _currentActor = _turns.Dequeue();
@@ -121,7 +128,10 @@ namespace Aftermath.Core
 
                 if (_currentActor.IsPlayerControlled)
                 {
+                    //TODO fix this
                     Engine.Instance._targetingModule.ReaquireTarget(Engine.Instance.Player);
+
+
                     //_playerCountdown = 50;
                     //The turn number is incremented just prior to the player's turn
                     TurnNumber++;

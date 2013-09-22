@@ -132,27 +132,11 @@ namespace Aftermath.Creatures
             }
         }
 
-        public Tile Tile
+        public Tile Location
         {
             get
             {
                 return _tile;
-            }
-        }
-
-        public int X
-        {
-            get
-            {
-                return _tile.X;
-            }
-        }
-
-        public int Y
-        {
-            get
-            {
-                return _tile.Y;
             }
         }
 

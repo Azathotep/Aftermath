@@ -35,11 +35,13 @@ namespace Aftermath.State
                     break;
                 case InputKey.F:
                     //fire at target
-                    if (targetingModule.Tile == Engine.Player.Tile)
+                    //if aiming at the player then cancel aiming mode
+                    if (targetingModule.Tile == Engine.Player.Location)
+                    {
+                        GameState.CurrentState = GameState.MovementState;
                         break;
+                    }
                     Engine.Player.FireAt(targetingModule.Tile);
-                    
-                    //GameState.CurrentState = GameState.MovementState;
                     break;
                 case InputKey.R:
                     //fire at target
