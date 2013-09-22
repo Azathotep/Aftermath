@@ -6,6 +6,8 @@ using Aftermath.Map;
 
 namespace Aftermath.AI
 {
+
+    //I like logic
     /// <summary>
     /// Generates a field that can be used by zombies to home in on targets. Zombies can share the same field which allows the number
     /// of zombies to be increased. The city map is too big to generate a field for the entire map. A field is generated around the 
