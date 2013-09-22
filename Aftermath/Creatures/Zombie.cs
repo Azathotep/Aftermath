@@ -35,17 +35,28 @@ namespace Aftermath.Creatures
             }
 
             Tile next = playermap.GetNext(Location);
-            if (next != null)
+            if (next == null)
             {
-                if (next.Creature != null && IsFood(next.Creature))
-                {
-                    Bite(next);
-                }
-                else
-                    MoveTo(next);
+                //if there is no path to follow then move randomly
+                Move(Compass.GetRandomCompassDirection());
             }
             else
-                Move(Compass.GetRandomCompassDirection());
+            {
+                //there is a path to follow and the tile is unblocked move there
+                if (next.Creature == null)
+                {
+                    MoveTo(next);
+                }
+                else
+                {
+                    //a creature blocks the path. If it's food then bite it, otherwise move randomly
+                    if (IsFood(next.Creature))
+                        Bite(next);
+                    else
+                        Move(Compass.GetRandomCompassDirection());
+                }                 
+            }
+                
             //zombies somehow know where the player is and chase
             //MoveTowards(Aftermath.Core.Engine.Instance.Player.Tile);
             //_skipNextTurn = true;
