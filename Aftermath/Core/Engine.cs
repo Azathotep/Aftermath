@@ -121,7 +121,7 @@ namespace Aftermath.Core
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 50; i++)
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();
@@ -324,6 +324,13 @@ namespace Aftermath.Core
                             bool flipHorizontal = !tile.Creature.FacingRight;
                             _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.5f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue, flipHorizontal);
                         }
+
+                        //draw a green fire zone for tiles that are in range
+                        if (GameState.CurrentState == GameState.AimingState)
+                        {
+                            if (_player.Location.GetManhattenDistanceFrom(tile) <= _player.SelectedGun.MaxRange)
+                                _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0.2f, 0, 0.005f));
+                        }
                     }
                     else
                     {
@@ -332,15 +339,30 @@ namespace Aftermath.Core
                     }
                 }
 
-            if (GameState.CurrentState == GameState.AimingState)
-            {
-                _renderer.Draw(_textureManager.GetTexture("overlay.crosshair"), new RectangleF(_targetingModule.Tile.X, _targetingModule.Tile.Y, 1, 1), 0.5f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
-            }
-
             foreach (Animation animation in _animationManager.Animations)
             {
                 animation.Render(_renderer);
             }
+
+
+            //draw the crosshair if in aim mode
+            if (GameState.CurrentState == GameState.AimingState)
+            {
+                //if the target is out of range or not visible then draw a red square to indicate it cannot be fired
+                //TODO refactor all this targetting and range stuff into the weapon
+                bool validTarget = true;
+                int targetDistance = _targetingModule.Tile.GetManhattenDistanceFrom(_player.Location);
+                if (targetDistance > _player.SelectedGun.MaxRange)
+                    validTarget = false;
+
+                if (!_playerVisibleTiles.Contains(_targetingModule.Tile))
+                    validTarget = false;
+                
+                if (!validTarget)
+                    _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(_targetingModule.Tile.X, _targetingModule.Tile.Y, 1, 1), 0.4f, 0, new Vector2F(0.5f, 0.5f), new Color(0.2f, 0, 0, 0.02f));
+                _renderer.Draw(_textureManager.GetTexture("overlay.crosshair"), new RectangleF(_targetingModule.Tile.X, _targetingModule.Tile.Y, 1, 1), 0.3f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
+            }
+
             _renderer.End();
 
             //Beginning of UI
@@ -355,12 +377,12 @@ namespace Aftermath.Core
             _renderer.Begin(world, projection, view);
 
             //display bullets
-            for (int x = 0; x < _player.LoadedAmmo; x++)
+            for (int x = 0; x < _player.SelectedGun.LoadedAmmo; x++)
             {
                 _renderer.Draw(new GameTexture("bullet", new RectangleI(0, 0, 32, 32)), new RectangleF(0 + x * 16, 0, 32, 32), 0.2f, 0, new Vector2F(0f, 0f), Color.AliceBlue);
             }
 
-            _renderer.DrawStringBox("Ammo: " + _player.LoadedAmmo, new RectangleF(200, 10, 550, 50), Color.White);
+            _renderer.DrawStringBox("Ammo: " + _player.SelectedGun.LoadedAmmo, new RectangleF(200, 10, 550, 50), Color.White);
 
             if (!Engine.Instance.Player.IsAlive)
             {

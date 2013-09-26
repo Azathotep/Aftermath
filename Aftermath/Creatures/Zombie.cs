@@ -15,6 +15,11 @@ namespace Aftermath.Creatures
         static int playermap_generatedTime = -1;
         static HomingField playermap=null;
 
+        public Zombie()
+        {
+            _health = 20;
+        }
+
         bool _skipNextTurn = false;
         public override void DoTurn()
         {

@@ -214,7 +214,6 @@ namespace Aftermath.Creatures
         {
             //TODO add damage type (eg bullet, fire, etc)
             //TODO find better method name, InduceDamage or CauseDamage or something..
-
             Engine.Instance.AnimationManager.StartAnimation(new BleedAnimation(this));
 
             _health -= damageAmount;
@@ -239,26 +238,59 @@ namespace Aftermath.Creatures
                 MoveTo(tiles[1]);
         }
 
-        public int LoadedAmmo=6;
+        public class Gun
+        {
+            internal int MaxRange
+            {
+                get
+                {
+                    return 5;
+                }
+            }
+
+            public int LoadedAmmo = 6;
+
+            internal bool Fire(Creature firer, Tile targetTile)
+            {
+                if (targetTile.GetManhattenDistanceFrom(firer.Location) > MaxRange)
+                    return false;
+                LoadedAmmo--;
+                Engine.Instance.AnimationManager.StartAnimation(new MuzzleFlashAnimation(firer));
+                if (targetTile.Creature != null)
+                    targetTile.Creature.PutDamage(10);
+                return true;
+            }
+
+            internal void Reload()
+            {
+                LoadedAmmo = 6;
+            }
+        }
+
+        Gun _selectedGun = new Gun();
+
+        internal Gun SelectedGun
+        {
+            get
+            {
+                return _selectedGun;
+            }
+        }
 
         internal void FireAt(Tile targetTile)
         {
-            if (LoadedAmmo <= 0)
-            {
-                Reload();
-                return;
-            }
-            LoadedAmmo--;
-            Engine.Instance.AnimationManager.StartAnimation(new MuzzleFlashAnimation(this));
-            if (targetTile.Creature != null)
-                targetTile.Creature.PutDamage(10);
+            if (_selectedGun.LoadedAmmo <= 0)
+                _selectedGun.Reload();
             Face(targetTile);
+            bool didFire = _selectedGun.Fire(this, targetTile);
+            if (!didFire)
+                return;
             EndTurn();
         }
 
         internal void Reload()
         {
-            LoadedAmmo = 6;
+            _selectedGun.Reload();
             EndTurn();
         }
     }

@@ -9,6 +9,11 @@ namespace Aftermath.Creatures
 {
     class Player : Creature
     {
+        public Player()
+        {
+            _health = 200;
+        }
+
         public override bool IsPlayerControlled
         {
             get
