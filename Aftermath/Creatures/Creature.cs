@@ -248,11 +248,25 @@ namespace Aftermath.Creatures
                 }
             }
 
+            /// <summary>
+            /// The current owner of the gun. This method allows the position of the gun to be obtained.
+            /// </summary>
+            public Creature Owner
+            {
+                get;
+                set;
+            }
+
             public int LoadedAmmo = 6;
+
+            internal bool CanReach(Tile targetTile)
+            {
+                return Owner.Location.GetManhattenDistanceFrom(targetTile) <= MaxRange;
+            }
 
             internal bool Fire(Creature firer, Tile targetTile)
             {
-                if (targetTile.GetManhattenDistanceFrom(firer.Location) > MaxRange)
+                if (!CanReach(targetTile))
                     return false;
                 LoadedAmmo--;
                 Engine.Instance.AnimationManager.StartAnimation(new MuzzleFlashAnimation(firer));
@@ -273,6 +287,7 @@ namespace Aftermath.Creatures
         {
             get
             {
+                _selectedGun.Owner = this;
                 return _selectedGun;
             }
         }

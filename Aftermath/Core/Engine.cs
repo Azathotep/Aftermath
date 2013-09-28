@@ -328,7 +328,7 @@ namespace Aftermath.Core
                         //draw a green fire zone for tiles that are in range
                         if (GameState.CurrentState == GameState.AimingState)
                         {
-                            if (_player.Location.GetManhattenDistanceFrom(tile) <= _player.SelectedGun.MaxRange)
+                            if (_playerVisibleTiles.Contains(tile) && _player.SelectedGun.CanReach(tile))
                                 _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0.2f, 0, 0.005f));
                         }
                     }
@@ -344,23 +344,10 @@ namespace Aftermath.Core
                 animation.Render(_renderer);
             }
 
-
             //draw the crosshair if in aim mode
             if (GameState.CurrentState == GameState.AimingState)
             {
-                //if the target is out of range or not visible then draw a red square to indicate it cannot be fired
-                //TODO refactor all this targetting and range stuff into the weapon
-                bool validTarget = true;
-                int targetDistance = _targetingModule.Tile.GetManhattenDistanceFrom(_player.Location);
-                if (targetDistance > _player.SelectedGun.MaxRange)
-                    validTarget = false;
-
-                if (!_playerVisibleTiles.Contains(_targetingModule.Tile))
-                    validTarget = false;
-                
-                if (!validTarget)
-                    _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(_targetingModule.Tile.X, _targetingModule.Tile.Y, 1, 1), 0.4f, 0, new Vector2F(0.5f, 0.5f), new Color(0.2f, 0, 0, 0.02f));
-                _renderer.Draw(_textureManager.GetTexture("overlay.crosshair"), new RectangleF(_targetingModule.Tile.X, _targetingModule.Tile.Y, 1, 1), 0.3f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
+                DrawCrosshair();
             }
 
             _renderer.End();
@@ -393,6 +380,22 @@ namespace Aftermath.Core
             _uiManager.RenderUI(_renderer);
             
             _renderer.End();
+        }
+
+        void DrawCrosshair()
+        {
+            //if the target is out of range or not visible then draw a red square to indicate it cannot be fired
+            //TODO refactor
+            bool validTarget = true;
+            if (!_playerVisibleTiles.Contains(_targetingModule.Tile))
+                validTarget = false;
+            bool canReach = _player.SelectedGun.CanReach(_targetingModule.Tile);
+            if (!canReach)
+                validTarget = false;
+
+            if (!validTarget)
+                _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(_targetingModule.Tile.X, _targetingModule.Tile.Y, 1, 1), 0.4f, 0, new Vector2F(0.5f, 0.5f), new Color(0.2f, 0, 0, 0.02f));
+            _renderer.Draw(_textureManager.GetTexture("overlay.crosshair"), new RectangleF(_targetingModule.Tile.X, _targetingModule.Tile.Y, 1, 1), 0.3f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
         }
 
         internal void UpdateFrame(GameTime gameTime)
