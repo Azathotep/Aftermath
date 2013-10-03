@@ -43,7 +43,7 @@ namespace Aftermath.Map
             for (int i = 0; i < 1000; i++)
             {
                 Tile tile = GetTile(r.Next(_width), r.Next(_height));
-                if (tile.Wall != WallType.None || tile.Creature != null)
+                if (tile.Material.IsSolid || tile.Creature != null)
                     continue;
                 return tile;
             }
@@ -55,7 +55,7 @@ namespace Aftermath.Map
             Tile tile = GetTile(x, y);
             if (tile == null)
                 return true;
-            return tile.IsOpaque;
+            return tile.Material.IsOpaque;
         }
     }
 }

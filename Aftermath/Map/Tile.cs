@@ -27,6 +27,19 @@ namespace Aftermath.Map
         Creature _creature=null;
         Creature _corpse = null;
 
+        protected TileMaterial _type;
+        internal TileMaterial Material
+        {
+            get
+            {
+                return _type;
+            }
+            set
+            {
+                _type = value;
+            }
+        }
+
         /// <summary>
         /// Creature occupying this tile
         /// </summary>
@@ -55,32 +68,6 @@ namespace Aftermath.Map
             set
             {
                 _corpse = value;
-            }
-        }
-
-        /// <summary>
-        /// Whether this tile is opaque (blocks vision)
-        /// </summary>
-        public bool IsOpaque
-        {
-            get
-            {
-                if (Wall == WallType.Door)
-                    return false;
-                return Wall != WallType.None;
-            }
-        }
-
-        /// <summary>
-        /// Whether the tile is passable (creatures can walk into it, eg walls are not passable)
-        /// </summary>
-        public bool IsPassable
-        {
-            get
-            {
-                if (Wall == WallType.Door)
-                    return true;
-                return Wall == WallType.None;
             }
         }
 
@@ -127,13 +114,6 @@ namespace Aftermath.Map
         }
 
         /// <summary>
-        /// Returns the type of wall on this tile. If no wall is present then the tile is floor.
-        /// </summary>
-        public WallType Wall = WallType.None;
-
-        public FloorType Floor = FloorType.Tile;
-
-        /// <summary>
         /// Returns whether a specified creature can enter this tile
         /// </summary>
         /// <returns>Whether a creature can enter this tile and if not, why not</returns>
@@ -141,7 +121,7 @@ namespace Aftermath.Map
         {
             if (Creature != null)
                 return ActionResult.TileOccupied;
-            if (!IsPassable)
+            if (Material.IsSolid)
                 return ActionResult.TileBlocked;
             return ActionResult.Ok;
         }

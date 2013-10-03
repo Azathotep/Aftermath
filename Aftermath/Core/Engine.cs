@@ -117,6 +117,7 @@ namespace Aftermath.Core
 
             _camera.Position = new Vector2F(5.5f, 5.5f);
             _player = new Player();
+            _player.WeildGun(new Creature.Gun());
             _turnSystem.RegisterCreature(_player);
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
@@ -237,72 +238,9 @@ namespace Aftermath.Core
                     Tile tile = _world.GetTile(x, y);
                     if (tile == null)
                         continue;
-                    string textureName = "steel.floor";
-                    if (tile.Wall == WallType.Steel)
-                    {
-                        Tile south = tile.GetNeighbour(CompassDirection.South);
-                        if (south != null && south.Wall == WallType.None && _playerSeenTiles.Contains(south))
-                        {
-                            textureName = "house.northwall";
-                        }
-                        else
-                            textureName = "house.solidwall";
-                    }
 
-                    if (tile.Floor == FloorType.Carpet)
-                        textureName = "house.carpet";
-
-                    if (tile.Wall == WallType.Door)
-                        textureName = "house.opendoor";
-
-                    if (tile.Floor == FloorType.Road)
-                        textureName = "road.road1";
-
-                    float rotation = 0;
-                    if (tile.Floor == FloorType.RoadLine)
-                    {
-                        textureName = "road.roadLinesHz";
-                        Tile north = tile.GetNeighbour(CompassDirection.North);
-                        
-                        Tile south = tile.GetNeighbour(CompassDirection.South);
-                        Tile east = tile.GetNeighbour(CompassDirection.North);
-                        Tile west = tile.GetNeighbour(CompassDirection.South);
-                        
-                        bool[] connected = new bool[4];
-                        foreach (CompassDirection direction in Compass.CardinalDirections)
-                        {
-                            Tile neighbour = tile.GetNeighbour(direction);
-                            if (neighbour == null)
-                                continue;
-                            if (neighbour.Floor == FloorType.RoadLine)
-                                connected[(int)direction] = true;
-                        }
-                        if (connected[(int)CompassDirection.North] && connected[(int)CompassDirection.East])
-                        {
-                            textureName = "road.corner";
-                            rotation = MathHelper.Pi + MathHelper.PiOver2;
-                        }
-                        else if (connected[(int)CompassDirection.North] && connected[(int)CompassDirection.West])
-                        {
-                            textureName = "road.corner";
-                            rotation = MathHelper.Pi;
-                        }
-                        else if (connected[(int)CompassDirection.South] && connected[(int)CompassDirection.East])
-                        {
-                            textureName = "road.corner";
-                            rotation = 0;
-                        }
-                        else if (connected[(int)CompassDirection.South] && connected[(int)CompassDirection.West])
-                        {
-                            textureName = "road.corner";
-                            rotation = MathHelper.PiOver2;
-                        }
-                        else if (connected[(int)CompassDirection.North] || connected[(int)CompassDirection.South])
-                        {
-                            textureName = "road.roadLinesHz";
-                            rotation = MathHelper.PiOver2;
-                        }                           
-                    }
+                    float rotation;
+                    string textureName = tile.Material.GetTexture(tile, out rotation);
 
                     bool isVisible = _playerVisibleTiles.Contains(tile);
                     bool hasSeen = _playerSeenTiles.Contains(tile);
@@ -380,6 +318,17 @@ namespace Aftermath.Core
             _uiManager.RenderUI(_renderer);
             
             _renderer.End();
+        }
+
+        /// <summary>
+        /// Set of tiles the player has seen/remembered
+        /// </summary>
+        public HashSet<Tile> PlayerSeenTiles
+        {
+            get
+            {
+                return _playerSeenTiles;
+            }
         }
 
         void DrawCrosshair()

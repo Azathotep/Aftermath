@@ -266,6 +266,8 @@ namespace Aftermath.Creatures
 
             internal bool Fire(Creature firer, Tile targetTile)
             {
+                if (LoadedAmmo < 0)
+                    return false;
                 if (!CanReach(targetTile))
                     return false;
                 LoadedAmmo--;
@@ -281,15 +283,19 @@ namespace Aftermath.Creatures
             }
         }
 
-        Gun _selectedGun = new Gun();
-
+        Gun _selectedGun;
         internal Gun SelectedGun
         {
             get
             {
-                _selectedGun.Owner = this;
                 return _selectedGun;
             }
+        }
+
+        public void WeildGun(Gun gun)
+        {
+            _selectedGun = gun;
+            _selectedGun.Owner = this;
         }
 
         internal void FireAt(Tile targetTile)

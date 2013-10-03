@@ -57,7 +57,7 @@ namespace Aftermath.AI
                         Tile tile = _world.GetTile(_x + x, _y + y);
                         if (tile == null)
                             continue;
-                        if (!tile.IsPassable)
+                        if (tile.Material.IsSolid)
                             continue;
                         int val = _map[x, y];
                         int lowestNeighbour = Math.Min(GetValue(x + 1, y), GetValue(x - 1, y));

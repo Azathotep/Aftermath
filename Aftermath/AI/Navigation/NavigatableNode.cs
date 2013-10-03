@@ -40,7 +40,7 @@ namespace Aftermath.AI.Navigation
                 Tile neighbour = _tile.GetNeighbour(direction);
                 if (neighbour == null)
                     continue;
-                if (!neighbour.IsPassable)
+                if (neighbour.Material.IsSolid)
                     continue;
                 ret.Add(new NavigatableNode(neighbour));
             }

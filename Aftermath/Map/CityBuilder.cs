@@ -32,16 +32,17 @@ namespace Aftermath.Map
                 {
                     Tile tile = city.GetTile(x, y);
                     Color c = bm.GetPixel(x, y);
+                    tile.Material = new Floor(FloorType.Pavement);
                     if (c == wallColor)
-                        tile.Wall = WallType.Steel;
+                        tile.Material = new Wall();
                     if (c == roadColor)
-                        tile.Floor = FloorType.Road;
+                        tile.Material = new Road(RoadType.Concrete);
                     if (c == roadLineColor)
-                        tile.Floor = FloorType.RoadLine;
+                        tile.Material = new Road(RoadType.Line);
                     if (c == carpetColor)
-                        tile.Floor = FloorType.Carpet;
+                        tile.Material = new Floor(FloorType.Carpet);
                     if (c == doorColor)
-                        tile.Wall = WallType.Door;
+                        tile.Material = new Door();
                 }
             return city;
         }
