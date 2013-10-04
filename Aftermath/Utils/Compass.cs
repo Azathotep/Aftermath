@@ -1,4 +1,6 @@
-﻿namespace Aftermath.Utils
+﻿using Aftermath.Input;
+
+namespace Aftermath.Utils
 {
     /// <summary>
     /// Provides operations for compass directions
@@ -80,6 +82,25 @@
                     return new Vector2I(-1, 1);
             }
             return new Vector2I(0, 0);
+        }
+
+        /// <summary>
+        /// Returns the direction mapped by a key or null if the key is not mapped to a direction
+        /// </summary>
+        public static CompassDirection? DirectionFromKey(InputKey key)
+        {
+            switch (key)
+            {
+                case InputKey.Up:
+                    return CompassDirection.North;
+                case InputKey.Right:
+                    return CompassDirection.East;
+                case InputKey.Left:
+                    return CompassDirection.West;
+                case InputKey.Down:
+                    return CompassDirection.South;
+            }
+            return null;
         }
     }
 

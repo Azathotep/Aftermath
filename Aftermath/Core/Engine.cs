@@ -144,6 +144,7 @@ namespace Aftermath.Core
 
             _keyboardHandler.RegisterKey(InputKey.F, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.R, retriggerInterval: 20);
+            _keyboardHandler.RegisterKey(InputKey.I, retriggerInterval: 0);
 
             _keyboardHandler.RegisterKey(InputKey.Left, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Right, retriggerInterval: 20);
@@ -282,6 +283,13 @@ namespace Aftermath.Core
                 animation.Render(_renderer);
             }
 
+            if (GameState.CurrentState == GameState.InteractState)
+            {
+                DrawTileOverlay(_renderer, _player.Location, new Color(0, 0.2f, 0.2f, 0.005f));
+                foreach (CompassDirection d in Compass.CardinalDirections)
+                    DrawTileOverlay(_renderer, _player.Location.GetNeighbour(d), new Color(0, 0.2f, 0.2f, 0.01f));
+            }
+
             //draw the crosshair if in aim mode
             if (GameState.CurrentState == GameState.AimingState)
             {
@@ -318,6 +326,11 @@ namespace Aftermath.Core
             _uiManager.RenderUI(_renderer);
             
             _renderer.End();
+        }
+
+        private void DrawTileOverlay(XnaRenderer renderer, Tile tile, Color color)
+        {
+            renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(tile.X, tile.Y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), color);
         }
 
         /// <summary>

@@ -183,7 +183,22 @@ namespace Aftermath.Map
         public override string GetTexture(Tile tile, out float rotation)
         {
             rotation = 0;
-            return "house.opendoor";
+            if (_isOpen)
+                return "house.opendoor";
+            else
+                return "house.shutdoor";
+        }
+
+        public bool IsOpen 
+        {
+            get
+            {
+                return _isOpen;
+            }
+            set
+            {
+                _isOpen = value;
+            }
         }
     }
 }

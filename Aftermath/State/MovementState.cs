@@ -37,6 +37,9 @@ namespace Aftermath.State
                 case InputKey.OemPeriod:
                     Engine.TurnSystem.CurrentActor.EndTurn();
                     break;
+                case InputKey.I:
+                    GameState.CurrentState = GameState.InteractState;
+                    break;
                 case InputKey.Escape:
                     GameState.CurrentState = GameState.GamePausedState;
                     //Engine.Exit();
