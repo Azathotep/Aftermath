@@ -20,9 +20,129 @@ namespace Aftermath.Creatures
             _health = 20;
         }
 
+        const int ZombieIdleSightDistance = 6;
+        const int ZombieEnragedSightDistance = 12;
+
+        List<Human> VisibleHumans()
+        {
+            List<Human> ret = new List<Human>();
+            List<Human> nearbyHumans = new List<Human>();
+            nearbyHumans.Add(Engine.Instance.Player);
+            foreach (var human in nearbyHumans)
+            {
+                HashSet<Tile> tiles = Engine.Instance.Player.ZombieViewField;
+                if (!tiles.Contains(Location))
+                    continue;
+                int sightRange = ZombieEnragedSightDistance;
+                //idle zombies have lower sight range
+                if (_state == ZombieState.Idle)
+                    sightRange = ZombieIdleSightDistance;
+                if (Location.GetChebyshevDistanceFrom(human.Location) > sightRange)
+                    continue;
+                ret.Add(human);
+            }
+            return ret;
+        }
+
+        enum ZombieState
+        {
+            Idle,
+            Enraged
+        }
+
+        byte _rageLevel = 0;
+
+        ZombieState _state = ZombieState.Idle;
+
+        Human _target;
+        Tile _targetTile;
+
         bool _skipNextTurn = false;
         public override void DoTurn()
         {
+            switch (_state)
+            {
+                //when zombie is idle it slowly shuffles around
+                //if a player gets to close it rages
+                case ZombieState.Idle:
+                    //look for visible targets
+                    List<Human> targets = VisibleHumans();
+                    //if there are no targets then move randomly
+                    if (targets.Count == 0)
+                    {
+                        _rageLevel = 0;
+                        //shamble about randomly
+                        if (Dice.Next(3) == 0)
+                            Move(Compass.GetRandomCompassDirection());
+                        return;
+                    }
+                    //increment rage count until enraged. Probably want to rage faster when really close
+                    _rageLevel++;
+                    if (_rageLevel > 3)
+                    {
+                        _rageLevel = 20;
+                        //TODO change to pick nearest target?
+                        Human target = targets[0];
+                        //become enraged and run at the target
+                        _state = ZombieState.Enraged;
+                        _target = target;
+                        _targetTile = target.Location;
+                    }
+                    break;
+                case ZombieState.Enraged:
+                    List<Human> visibleHumans = VisibleHumans();
+                    //maximum rage while humans are visible else range falls
+                    if (visibleHumans.Count > 0)
+                        _rageLevel = 20;
+                    else
+                        _rageLevel--;
+
+                    //chase target
+                    if (_target != null)
+                    {
+                        if (visibleHumans.Contains(_target))
+                            _targetTile = _target.Location;
+                        else
+                        {
+                            //if already at the last seen tile and can't see target then target has been lost
+                            if (Location == _targetTile)
+                            {
+                                _target = null;
+                                _targetTile = null;
+                            }
+                        }
+                    }
+
+                    if (_target == null && visibleHumans.Count > 0)
+                    {
+                        _target = visibleHumans[0];
+                        _targetTile = _target.Location;
+                    }
+
+                    //if no target then just stand there angry until a new target is aquired
+                    //move towards target
+                    if (_targetTile != null)
+                    {
+                        Tile tile = GetNextTileTowards(_targetTile);
+                        if (tile == null)
+                            return;
+                        if (tile.Creature != null && IsFood(tile.Creature))
+                            Bite(tile);
+                        else
+                            MoveTo(tile);
+                    }
+                    
+                    //if rage level drops then switch back to idle state
+                    if (_rageLevel == 0)
+                    {
+                        _target = null;
+                        _targetTile = null;
+                        _state = ZombieState.Idle;
+                    }
+                    break;
+            }
+            return;
+
             if (Engine.Instance.TurnSystem.TurnNumber != playermap_generatedTime)
             {
                 playermap = new HomingField(Engine.Instance.World, 30, 30); //50, 50);

@@ -126,7 +126,7 @@ namespace Aftermath.Core
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();
-                if (tile.GetManhattenDistanceFrom(_player.Location) < 20)
+                if (tile.GetChebyshevDistanceFrom(_player.Location) < 15)
                 {
                     i--;
                     continue;
@@ -375,9 +375,9 @@ namespace Aftermath.Core
             _textureManager.RegisterSpriteSheetTextures("overlay");
         }
 
-        internal HashSet<Tile> GetFov(int eyeX, int eyeY, int sightRadius)
+        internal HashSet<Tile> GetFov(Tile eyePosition, int sightRadius)
         {
-            return _fov.GetFov(_world, new Vector2I(eyeX, eyeY), sightRadius);
+            return _fov.GetFov(_world, new Vector2I(eyePosition.X, eyePosition.Y), sightRadius);
         }
 
         internal void Exit()
@@ -386,7 +386,7 @@ namespace Aftermath.Core
                 OnExit(this, EventArgs.Empty);
         }
 
-        public Creature Player 
+        public Player Player 
         {
             get
             {

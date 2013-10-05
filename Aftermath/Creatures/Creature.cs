@@ -157,7 +157,7 @@ namespace Aftermath.Creatures
         /// </summary>
         public HashSet<Tile> GetVisibleTiles()
         {
-            return Engine.Instance.GetFov(_tile.X, _tile.Y, _sightRadius);
+            return _tile.GetVisibleTiles(_sightRadius);
         }
 
         /// <summary>
@@ -238,6 +238,14 @@ namespace Aftermath.Creatures
                 MoveTo(tiles[1]);
         }
 
+        public Tile GetNextTileTowards(Tile tile)
+        {
+            Tile[] tiles = _tile.GetTraversablePath(tile);
+            if (tiles.Length > 1)
+                return tiles[1];
+            return null;
+        }
+
         public class Gun
         {
             internal int MaxRange
@@ -261,7 +269,7 @@ namespace Aftermath.Creatures
 
             internal bool CanReach(Tile targetTile)
             {
-                return Owner.Location.GetManhattenDistanceFrom(targetTile) <= MaxRange;
+                return Owner.Location.GetChebyshevDistanceFrom(targetTile) <= MaxRange;
             }
 
             internal bool Fire(Creature firer, Tile targetTile)
@@ -313,6 +321,11 @@ namespace Aftermath.Creatures
         {
             _selectedGun.Reload();
             EndTurn();
+        }
+
+        public virtual void PostTurn()
+        {
+            
         }
     }
 

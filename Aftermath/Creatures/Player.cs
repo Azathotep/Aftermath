@@ -7,7 +7,7 @@ using Aftermath.Utils;
 
 namespace Aftermath.Creatures
 {
-    class Player : Creature
+    class Player : Human
     {
         public Player()
         {

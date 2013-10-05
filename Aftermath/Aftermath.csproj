@@ -50,6 +50,7 @@
     <Compile Include="Core\FovRecursiveShadowcast.cs" />
     <Compile Include="Core\TurnSystem.cs" />
     <Compile Include="Creatures\Creature.cs" />
+    <Compile Include="Creatures\Human.cs" />
     <Compile Include="Creatures\Player.cs" />
     <Compile Include="Creatures\Zombie.cs" />
     <Compile Include="Game1.cs" />

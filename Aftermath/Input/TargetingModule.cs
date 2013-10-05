@@ -73,7 +73,7 @@ namespace Aftermath.Input
 
             //module has no target or an invalid target so aquire a new target
             //go for the nearest living creature in range
-            Creature nearestTarget = (from c in visibleCreatures where c.IsAlive orderby c.Location.GetManhattenDistanceFrom(targeter.Location) select c).FirstOrDefault();
+            Creature nearestTarget = (from c in visibleCreatures where c.IsAlive orderby c.Location.GetChebyshevDistanceFrom(targeter.Location) select c).FirstOrDefault();
             if (nearestTarget == null || !targeter.SelectedGun.CanReach(nearestTarget.Location))
             {
                 //no available target so reset crosshair to owner's tile

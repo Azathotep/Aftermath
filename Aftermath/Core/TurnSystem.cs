@@ -66,7 +66,7 @@ namespace Aftermath.Core
         {
             if (_currentActor != null)
             {
-                //_currentActor.PostTurn();
+                _currentActor.PostTurn();
                 _currentActor = null;
             }
         }
@@ -142,7 +142,11 @@ namespace Aftermath.Core
                 {
                     //when the actor is not player controlled they are made to move immediately
                     if (_currentActor.IsAlive)
+                    {
+                        Creature actor = _currentActor;
                         _currentActor.DoTurn();
+                        actor.PostTurn();
+                    }
                     _currentActor = null;
                 }
             }

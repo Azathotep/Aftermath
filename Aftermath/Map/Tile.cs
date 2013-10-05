@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Aftermath.Core;
 using Aftermath.Creatures;
 using Aftermath.AI.Navigation;
 using Aftermath.Utils;
@@ -53,6 +54,11 @@ namespace Aftermath.Map
             {
                 _creature = value;
             }
+        }
+
+        public HashSet<Tile> GetVisibleTiles(int sightRange)
+        {
+            return Engine.Instance.GetFov(this, sightRange);
         }
 
         //TODO only one corpse saved?
@@ -129,6 +135,11 @@ namespace Aftermath.Map
         internal int GetManhattenDistanceFrom(Tile other)
         {
             return Math.Abs(other.X - X) + Math.Abs(other.Y - Y);
+        }
+
+        internal int GetChebyshevDistanceFrom(Tile other)
+        {
+            return Math.Max(Math.Abs(other.X - X), Math.Abs(other.Y - Y));
         }
 
         /// <summary>

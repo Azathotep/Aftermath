@@ -35,7 +35,7 @@ namespace Aftermath.AI.Navigation
         public INavigatableNode[] GetNeighbours()
         {
             List<INavigatableNode> ret = new List<INavigatableNode>();
-            foreach (CompassDirection direction in Compass.CardinalDirections)
+            foreach (CompassDirection direction in Compass.CompassDirections)
             {
                 Tile neighbour = _tile.GetNeighbour(direction);
                 if (neighbour == null)
@@ -49,7 +49,7 @@ namespace Aftermath.AI.Navigation
 
         public int GetHeuristicCostTo(INavigatableNode target)
         {
-            return _tile.GetManhattenDistanceFrom(((NavigatableNode)target)._tile);
+            return _tile.GetChebyshevDistanceFrom(((NavigatableNode)target)._tile);
         }
 
         public int GetCostTo(AStarNode nodeInfo, INavigatableNode to)
