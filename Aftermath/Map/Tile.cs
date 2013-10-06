@@ -143,6 +143,20 @@ namespace Aftermath.Map
         }
 
         /// <summary>
+        /// Returns the level of light on this tile
+        /// </summary>
+        public float LightLevel
+        {
+            get
+            {
+                //calculate light from player torch                
+                float torch = 0.4f / Engine.Instance.Player.Location.GetManhattenDistanceFrom(this);
+                //TODO don't apply sunlight for tiles that are indoors
+                return _world.Sunlight + 0.1f + torch;
+            }
+        }
+
+        /// <summary>
         /// Returns a path of tiles from this tile to a target tile
         /// </summary>
         public Tile[] GetTraversablePath(Tile target)

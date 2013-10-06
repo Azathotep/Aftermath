@@ -45,7 +45,14 @@ namespace Aftermath.Core
             _keyboardHandler = new XnaKeyboardHandler(KeyHandler);
             _camera = new Camera();
             _turnSystem = new TurnSystem();
+            _turnSystem.OnTurnAdvanced += _turnSystem_OnTurnAdvanced;
             _uiManager.RegisterMenu("PauseMenu", new PauseMenu());
+        }
+
+        void _turnSystem_OnTurnAdvanced()
+        {
+            //advance the time of day each turn (minutes)
+            _world.TimeOfDay += 10;
         }
 
         static Engine _instance;
@@ -249,7 +256,7 @@ namespace Aftermath.Core
                     if (!isVisible && !hasSeen)
                         continue;
                     _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
-                    if (isVisible)
+                    if (isVisible && tile.GetManhattenDistanceFrom(Player.Location) < tile.LightLevel * 5 + 1)
                     {
                         //draw corpse first
                         if (tile.Corpse != null)
@@ -264,7 +271,8 @@ namespace Aftermath.Core
                             _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.5f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue, flipHorizontal);
                         }
 
-                        //draw a green fire zone for tiles that are in range
+                        DrawTileOverlay(_renderer, tile, new Color(0, 0, 0, 1 - tile.LightLevel));
+
                         if (GameState.CurrentState == GameState.AimingState)
                         {
                             if (_playerVisibleTiles.Contains(tile) && _player.SelectedGun.CanReach(tile))
@@ -273,6 +281,8 @@ namespace Aftermath.Core
                     }
                     else
                     {
+                        DrawTileOverlay(_renderer, tile, new Color(0, 0, 0, 1 - tile.LightLevel));
+
                         //tile not visible but remembered. Draw dark overlay.
                         _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.5f));
                     }
@@ -330,7 +340,7 @@ namespace Aftermath.Core
 
         private void DrawTileOverlay(XnaRenderer renderer, Tile tile, Color color)
         {
-            renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(tile.X, tile.Y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), color);
+            renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(tile.X, tile.Y, 1, 1), 0.4f, 0, new Vector2F(0.5f, 0.5f), color);
         }
 
         /// <summary>

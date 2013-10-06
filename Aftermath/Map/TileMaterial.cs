@@ -146,6 +146,14 @@ namespace Aftermath.Map
             _type = type;
         }
 
+        public FloorType Type
+        {
+            get
+            {
+                return _type;
+            }
+        }
+
         public override string GetTexture(Tile tile, out float rotation)
         {
             rotation = 0;

@@ -14,6 +14,8 @@ namespace Aftermath.Core
     {
         Queue<Creature> _turns = new Queue<Creature>();
 
+        public event Action OnTurnAdvanced;
+
         public void RegisterCreature(Creature creature)
         {
             _turns.Enqueue(creature);
@@ -135,7 +137,9 @@ namespace Aftermath.Core
                     //_playerCountdown = 50;
                     //The turn number is incremented just prior to the player's turn
                     TurnNumber++;
-                    //TODO raise TurnAdvanced event?
+
+                    if (OnTurnAdvanced != null)
+                        OnTurnAdvanced();
                     //Do nothing else, the player's keyboard input determines when and what the player's turn action is
                 }
                 else

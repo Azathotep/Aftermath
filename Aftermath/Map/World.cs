@@ -57,5 +57,47 @@ namespace Aftermath.Map
                 return true;
             return tile.Material.IsOpaque;
         }
+
+        int _timeOfDay;
+        public int TimeOfDay
+        {
+            get
+            {
+                return _timeOfDay;
+            }
+            set
+            {
+                _timeOfDay = value;
+                if (_timeOfDay >= 1440)
+                    _timeOfDay -= 1440;
+            }
+        }
+
+        /// <summary>
+        /// Returns the current level of sunlight in the world which depends on the time of day
+        /// </summary>
+        public float Sunlight
+        {
+            get
+            {
+                //TODO this is calculated several times on every frame for every tile drawn. Maybe cache this.
+                if (_timeOfDay >= 600) //10am
+                {
+                    if (_timeOfDay <= 960) //4pm 
+                        return 1;
+                    if (_timeOfDay <= 1200) //8pm
+                        return 1 - ((float)_timeOfDay - 960) / (1200 - 960);
+                    else
+                        return 0;
+                }
+                else
+                {
+                    if (_timeOfDay <= 420) //7am
+                        return 0;
+                    else
+                        return ((float)_timeOfDay - 420) / 200;
+                }
+            }
+        }
     }
 }
