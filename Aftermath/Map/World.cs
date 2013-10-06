@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Aftermath.Core;
 
 namespace Aftermath.Map
 {
@@ -99,5 +100,7 @@ namespace Aftermath.Map
                 }
             }
         }
+
+        public List<Light> Lights = new List<Light>();
     }
 }

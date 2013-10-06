@@ -52,7 +52,7 @@ namespace Aftermath.Core
         void _turnSystem_OnTurnAdvanced()
         {
             //advance the time of day each turn (minutes)
-            _world.TimeOfDay += 10;
+            _world.TimeOfDay += 1;
         }
 
         static Engine _instance;
@@ -118,6 +118,8 @@ namespace Aftermath.Core
 
         public void Initialize()
         {
+            _fov = new FovRecursiveShadowcast();
+
             _world = new World(10, 10);
             CityBuilder builder = new CityBuilder();
             _world = builder.FromBitmap(@"Content\city.bmp");
@@ -128,7 +130,7 @@ namespace Aftermath.Core
             _turnSystem.RegisterCreature(_player);
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
-
+            
             for (int i = 0; i < 50; i++)
             {
                 Zombie zombie = new Zombie();
@@ -142,8 +144,7 @@ namespace Aftermath.Core
                 tile.PlaceCreature(zombie);
             }
 
-            _fov = new FovRecursiveShadowcast();
-
+            
             _keyboardHandler.RegisterKey(InputKey.W, retriggerInterval:0);
             _keyboardHandler.RegisterKey(InputKey.A, retriggerInterval: 0);
             _keyboardHandler.RegisterKey(InputKey.S, retriggerInterval: 0);
@@ -151,7 +152,7 @@ namespace Aftermath.Core
 
             _keyboardHandler.RegisterKey(InputKey.F, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.R, retriggerInterval: 20);
-            _keyboardHandler.RegisterKey(InputKey.I, retriggerInterval: 0);
+            _keyboardHandler.RegisterKey(InputKey.I, retriggerInterval: 20);
 
             _keyboardHandler.RegisterKey(InputKey.Left, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Right, retriggerInterval: 20);
@@ -222,7 +223,7 @@ namespace Aftermath.Core
             Rectangle tileRangeToDraw = new Rectangle((int)topLeft.X - 1, (int)topLeft.Y - 1, (int)bottomRight.X - (int)topLeft.X + 2, (int)bottomRight.Y - (int)topLeft.Y + 2);
 
             Matrix world = Matrix.Identity;
-            Matrix projection = Matrix.CreateOrthographic(30, 24, -1000.5f, 100);
+            Matrix projection = Matrix.CreateOrthographic(50, 40, -1000.5f, 100); //30, 24, -1000.5f, 100);
             if (!Engine.Instance.Player.IsAlive)
             {
                 projection = Matrix.CreateOrthographic(30 - 15 * _zoomAmt, 24 - 12 * _zoomAmt, -1000.5f, 100);
@@ -237,8 +238,8 @@ namespace Aftermath.Core
 
             //int width=20;
             //int height = 14;
-            int width = 30;
-            int height = 20;
+            int width = 60;  //30;
+            int height = 40; // 20;
             //draw the viewable part of the map to the screen
             for (int y=(int)_camera.Position.Y - height;y<=_camera.Position.Y + height;y++)
                 for (int x = (int)_camera.Position.X - width; x <= _camera.Position.X + width; x++)
@@ -253,10 +254,14 @@ namespace Aftermath.Core
                     bool isVisible = _playerVisibleTiles.Contains(tile);
                     bool hasSeen = _playerSeenTiles.Contains(tile);
                     //isVisible = true;
+
+                    if (tile != Player.Location && tile.LightLevel <= 0.1f)
+                        isVisible = false;
+                    
                     if (!isVisible && !hasSeen)
                         continue;
                     _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
-                    if (isVisible && tile.GetManhattenDistanceFrom(Player.Location) < tile.LightLevel * 5 + 1)
+                    if (isVisible)
                     {
                         //draw corpse first
                         if (tile.Corpse != null)
@@ -271,7 +276,7 @@ namespace Aftermath.Core
                             _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.5f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue, flipHorizontal);
                         }
 
-                        DrawTileOverlay(_renderer, tile, new Color(0, 0, 0, 1 - tile.LightLevel));
+                        DrawTileOverlay(_renderer, tile, new Color(0.1f, 0.1f, 0, 1 - tile.LightLevel));
 
                         if (GameState.CurrentState == GameState.AimingState)
                         {
@@ -281,10 +286,13 @@ namespace Aftermath.Core
                     }
                     else
                     {
-                        DrawTileOverlay(_renderer, tile, new Color(0, 0, 0, 1 - tile.LightLevel));
+                        DrawTileOverlay(_renderer, tile, new Color(0.1f, 0.1f, 0, 0.9f));
 
+
+                        //_renderer.Draw(_textureManager.GetTexture("overlay.gauze"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.5f));
+                    
                         //tile not visible but remembered. Draw dark overlay.
-                        _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.5f));
+                        //_renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.5f));
                     }
                 }
 

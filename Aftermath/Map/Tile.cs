@@ -149,10 +149,22 @@ namespace Aftermath.Map
         {
             get
             {
-                //calculate light from player torch                
-                float torch = 0.4f / Engine.Instance.Player.Location.GetManhattenDistanceFrom(this);
+                //calculate light from player torch
+                float torch = 0;
+                if (Engine.Instance.Player.Location.GetDistanceSquared(this) < 8)
+                    torch = 0.4f;
+                //float torch = 0.4f / Engine.Instance.Player.Location.GetDistanceSquared(this);
+
+                float totalBr = 0;
+                foreach (Light light in _world.Lights)
+                {
+                    totalBr += light.GetBrightnessAt(this);
+                }
+                if (totalBr > 0.8f)
+                    totalBr = 0.8f;
+
                 //TODO don't apply sunlight for tiles that are indoors
-                return _world.Sunlight + 0.1f + torch;
+                return _world.Sunlight + totalBr + 0.1f +torch;
             }
         }
 
@@ -164,6 +176,11 @@ namespace Aftermath.Map
             AStarAlgorithm astar = new AStarAlgorithm();
             var path = astar.FindPath(new NavigatableNode(this), new NavigatableNode(target));
             return (from p in path select ((NavigatableNode)p).Tile).ToArray();
+        }
+
+        internal int GetDistanceSquared(Tile Location)
+        {
+            return (Location.X - X)*(Location.X - X) + (Location.Y - Y)*(Location.Y - Y);
         }
     }
 }

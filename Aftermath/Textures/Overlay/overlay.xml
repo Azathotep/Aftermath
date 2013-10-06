@@ -2,5 +2,6 @@
 <main size="32">
   <image name="blood" x="1" y="1" />
   <image name="crosshair" x="35" y="1" />
-  <image name="fireball" x="1" y="35" />
+  <image name="fireball" x="69" y="1" />
+  <image name="gauze" x="1" y="35" />
 </main>

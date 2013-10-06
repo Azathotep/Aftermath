@@ -27,6 +27,11 @@ namespace Aftermath.State
                 if (door != null)
                 {
                     door.IsOpen = !door.IsOpen;
+
+                    //if a door opens and closes need to update nearby light fields
+                    //TODO redesign this, no need to update every light on the map
+                    foreach (Light light in Core.Engine.Instance.World.Lights)
+                        light.RecalculateLightfield();
                     Engine.Player.EndTurn();
                 }
                 GameState.CurrentState = GameState.MovementState;

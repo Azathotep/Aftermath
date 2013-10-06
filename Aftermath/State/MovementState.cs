@@ -35,7 +35,12 @@ namespace Aftermath.State
                     Engine.TurnSystem.CurrentActor.Move(CompassDirection.South);
                     break;
                 case InputKey.OemPeriod:
-                    Engine.TurnSystem.CurrentActor.EndTurn();
+                    Map.Light l = new Map.Light();
+                    l.Location = Core.Engine.Instance.Player.Location;
+                    l.RecalculateLightfield();
+                    Core.Engine.Instance.World.Lights.Add(l);
+
+                    //Engine.TurnSystem.CurrentActor.EndTurn();
                     break;
                 case InputKey.I:
                     GameState.CurrentState = GameState.InteractState;
