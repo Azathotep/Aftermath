@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Aftermath.Core;
+using Aftermath.Lighting;
 
 namespace Aftermath.Map
 {
@@ -101,6 +102,16 @@ namespace Aftermath.Map
             }
         }
 
-        public List<Light> Lights = new List<Light>();
+        List<PointLight> _lights = new List<PointLight>();
+        /// <summary>
+        /// Returns the list of point light in the world
+        /// </summary>
+        public List<PointLight> Lights
+        {
+            get
+            {
+                return _lights;
+            }
+        }
     }
 }

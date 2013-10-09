@@ -6,6 +6,8 @@ using Aftermath.Core;
 using Aftermath.Creatures;
 using Aftermath.AI.Navigation;
 using Aftermath.Utils;
+using Aftermath.Lighting;
+using Microsoft.Xna.Framework;
 
 namespace Aftermath.Map
 {
@@ -56,9 +58,22 @@ namespace Aftermath.Map
             }
         }
 
-        public HashSet<Tile> GetVisibleTiles(int sightRange)
+        /// <summary>
+        /// Returns the set of tiles visible from this tile
+        /// </summary>
+        /// <param name="sightRange">maximum vision range</param>
+        /// <param name="lightThreshold">minimum level of light a tile must have to be visible</param>
+        /// <returns></returns>
+        public HashSet<Tile> GetVisibleTiles(int sightRange, float lightThreshold = 0)
         {
-            return Engine.Instance.GetFov(this, sightRange);
+            HashSet<Tile> ret = Engine.Instance.GetFov(this, sightRange);
+            if (lightThreshold > 0)
+            {
+                foreach (Tile tile in ret.ToArray())
+                    if (tile.GetLighting(this).Brightness < lightThreshold)
+                        ret.Remove(tile);
+            }
+            return ret;
         }
 
         //TODO only one corpse saved?
@@ -143,28 +158,75 @@ namespace Aftermath.Map
         }
 
         /// <summary>
-        /// Returns the level of light on this tile
+        /// Returns the current level of sunlight at this tile
         /// </summary>
-        public float LightLevel
+        public float Sunlight
         {
             get
             {
-                //calculate light from player torch
-                float torch = 0;
-                if (Engine.Instance.Player.Location.GetDistanceSquared(this) < 8)
-                    torch = 0.4f;
-                //float torch = 0.4f / Engine.Instance.Player.Location.GetDistanceSquared(this);
+                //TODO inside tiles should always have 0 sunlight
+                return _world.Sunlight;
+            }
+        }
 
-                float totalBr = 0;
-                foreach (Light light in _world.Lights)
+        /// <summary>
+        /// Returns the ambient lighting (ambient + sunlight) at this tile. Ambient lighting changes a lot for an outsid tile
+        /// </summary>
+        Light AmbientLighting
+        {
+            get
+            {
+                return new Light(Sunlight + 0.2f, new Color(Sunlight + 0.2f, Sunlight + 0.2f, Sunlight + 0.2f));
+            }
+        }
+
+        Light _pointLighting = Light.PitchBlack;
+        /// <summary>
+        /// Returns the point lighting at this tile. Eg flashlights, bulbs. Point lighting is expensive to compute so is
+        /// cached.
+        /// </summary>
+        Light PointLighting
+        {
+            get
+            {
+                return _pointLighting;
+            }
+        }
+
+        /// <summary>
+        /// Returns the total lighting (ambient + point) of this tile. Only relevant for floor tiles. Wall tiles
+        /// share the light of a neighbouring floor tile
+        /// </summary>
+        Light TotalLighting
+        {
+            get
+            {
+                Color totalColor = new Color(AmbientLighting.Color.R + PointLighting.Color.R,
+                    AmbientLighting.Color.G + PointLighting.Color.G,
+                    AmbientLighting.Color.B + PointLighting.Color.B);
+                return new Light(AmbientLighting.Brightness + PointLighting.Brightness, totalColor);
+            }
+        }
+
+        /// <summary>
+        /// Recalculates the point lighting of the tile from all nearby point lights
+        /// </summary>
+        public void RecalculatePointLighting()
+        {
+            _pointLighting = Light.PitchBlack;
+            float totalBr = 0;
+            foreach (PointLight light in _world.Lights)
+            {
+                totalBr = light.GetBrightnessAt(this);
+                Color lightColor = light.Color;
+                lightColor *= totalBr;
+                if (totalBr > 0)
                 {
-                    totalBr += light.GetBrightnessAt(this);
+                    _pointLighting.Color.R = (byte)Math.Min(_pointLighting.Color.R + lightColor.R, 255);
+                    _pointLighting.Color.G = (byte)Math.Min(_pointLighting.Color.G + lightColor.G, 255);
+                    _pointLighting.Color.B = (byte)Math.Min(_pointLighting.Color.B + lightColor.B, 255);
+                    _pointLighting.Brightness += totalBr;
                 }
-                if (totalBr > 0.8f)
-                    totalBr = 0.8f;
-
-                //TODO don't apply sunlight for tiles that are indoors
-                return _world.Sunlight + totalBr + 0.1f +torch;
             }
         }
 
@@ -181,6 +243,86 @@ namespace Aftermath.Map
         internal int GetDistanceSquared(Tile Location)
         {
             return (Location.X - X)*(Location.X - X) + (Location.Y - Y)*(Location.Y - Y);
+        }
+
+        /// <summary>
+        /// Returns the light level/brightness of this tile. The light level depends on the eye position 
+        /// if the tile is opaque.
+        /// </summary>
+        /// <param name="eyePosition"></param>
+        /// <returns></returns>
+        internal Light GetLighting(Tile eyePosition)
+        {
+            //if tile is floor then brightness is the comination of sunlight and point lights on this tile
+            if (!Material.IsOpaque)
+                return TotalLighting;
+            //tile blocks light (eg a wall), so the brightness depends on which side of the wall the eye position is
+            //from inside a well lit room the walls appear bright, from outside in the night the walls appear dark
+            //use the brightness of a floor neighbour
+            //TODO refactor
+            Light light;
+            if (eyePosition.X < X)
+            {
+                light = GetNeighbourLighting(CompassDirection.West);
+                if (light.Brightness > 0)
+                    return light;
+
+                if (eyePosition.Y < Y)
+                {
+                    light = GetNeighbourLighting(CompassDirection.NorthWest);
+                    if (light.Brightness > 0)
+                        return light;
+                }
+                if (eyePosition.Y > Y)
+                {
+                    light = GetNeighbourLighting(CompassDirection.SouthWest);
+                    if (light.Brightness > 0)
+                        return light;
+                }
+            }
+
+            if (eyePosition.X > X)
+            {
+                light = GetNeighbourLighting(CompassDirection.East);
+                if (light.Brightness > 0)
+                    return light;
+                if (eyePosition.Y < Y)
+                {
+                    light = GetNeighbourLighting(CompassDirection.NorthEast);
+                    if (light.Brightness > 0)
+                        return light;
+                }
+                if (eyePosition.Y > Y)
+                {
+                    light = GetNeighbourLighting(CompassDirection.SouthEast);
+                    if (light.Brightness > 0)
+                        return light;
+                }
+            }
+            if (eyePosition.Y < Y)
+            {
+                light = GetNeighbourLighting(CompassDirection.North);
+                if (light.Brightness > 0)
+                    return light;
+            }
+            if (eyePosition.Y > Y)
+            {
+                light = GetNeighbourLighting(CompassDirection.South);
+                if (light.Brightness > 0)
+                    return light;
+            }
+            return Light.PitchBlack;
+        }
+
+        /// <summary>
+        /// Returns the light level of a neighbouring tile IF the tile is transparent to light
+        /// </summary>
+        Light GetNeighbourLighting(CompassDirection direction)
+        {
+            Tile n = GetNeighbour(direction);
+            if (n == null || n.Material.IsOpaque)
+                return Light.PitchBlack;
+            return n.TotalLighting;
         }
     }
 }

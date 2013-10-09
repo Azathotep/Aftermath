@@ -6,6 +6,7 @@ using Aftermath.Input;
 using Aftermath.Animations;
 using Aftermath.Utils;
 using Aftermath.Map;
+using Aftermath.Lighting;
 
 namespace Aftermath.State
 {
@@ -30,7 +31,7 @@ namespace Aftermath.State
 
                     //if a door opens and closes need to update nearby light fields
                     //TODO redesign this, no need to update every light on the map
-                    foreach (Light light in Core.Engine.Instance.World.Lights)
+                    foreach (PointLight light in Core.Engine.Instance.World.Lights)
                         light.RecalculateLightfield();
                     Engine.Player.EndTurn();
                 }

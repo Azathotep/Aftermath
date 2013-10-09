@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Aftermath.Rendering;
 using Aftermath.Utils;
+using Aftermath.Lighting;
 
 namespace Aftermath.Creatures
 {
@@ -32,6 +33,15 @@ namespace Aftermath.Creatures
             }
         }
 
+        public override void PostTurn()
+        {
+            //get the torch to follow the player
+            //refactor this
+            Flashlight.Location = Location;
+            Flashlight.RecalculateLightfield();
+            base.PostTurn();
+        }
 
+        public PointLight Flashlight;
     }
 }

@@ -152,12 +152,15 @@ namespace Aftermath.Creatures
 
         protected int _sightRadius = 15;
 
+
         /// <summary>
         /// Returns the set of tiles currently visible to the creature
         /// </summary>
-        public HashSet<Tile> GetVisibleTiles()
+        /// <param name="lightThreshold">minimum level of light for tile to be visible</param>
+        /// <returns>set of visible tiles</returns>
+        public HashSet<Tile> GetVisibleTiles(float lightThreshold = 0)
         {
-            return _tile.GetVisibleTiles(_sightRadius);
+            return _tile.GetVisibleTiles(_sightRadius, lightThreshold);
         }
 
         /// <summary>

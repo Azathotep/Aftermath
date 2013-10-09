@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using Aftermath.Input;
 using Aftermath.Utils;
+using Aftermath.Lighting;
+using Microsoft.Xna.Framework;
 
 namespace Aftermath.State
 {
@@ -35,12 +37,15 @@ namespace Aftermath.State
                     Engine.TurnSystem.CurrentActor.Move(CompassDirection.South);
                     break;
                 case InputKey.OemPeriod:
-                    Map.Light l = new Map.Light();
-                    l.Location = Core.Engine.Instance.Player.Location;
-                    l.RecalculateLightfield();
+                    Color color = new Color(1f, 0f, 0f);
+                    if (Dice.Next(3) == 0)
+                        color = new Color(0f, 1f, 0f);
+                    else if (Dice.Next(3) == 0)
+                        color = new Color(0f, 0f, 1f);
+                    PointLight l = new PointLight(Core.Engine.Instance.Player.Location, 6, color);
                     Core.Engine.Instance.World.Lights.Add(l);
-
-                    //Engine.TurnSystem.CurrentActor.EndTurn();
+                    l.RecalculateLightfield();
+                    Engine.TurnSystem.CurrentActor.EndTurn();
                     break;
                 case InputKey.I:
                     GameState.CurrentState = GameState.InteractState;

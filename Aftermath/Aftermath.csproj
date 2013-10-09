@@ -54,7 +54,8 @@
     <Compile Include="Creatures\Player.cs" />
     <Compile Include="Creatures\Zombie.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="Map\Light.cs" />
+    <Compile Include="Lighting\Light.cs" />
+    <Compile Include="Lighting\PointLight.cs" />
     <Compile Include="Map\TileMaterial.cs" />
     <Compile Include="State\AimingState.cs" />
     <Compile Include="State\InteractState.cs" />

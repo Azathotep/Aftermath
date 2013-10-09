@@ -12,6 +12,7 @@ using Aftermath.Creatures;
 using Aftermath.Animations;
 using Aftermath.State;
 using Aftermath.UI;
+using Aftermath.Lighting;
 
 namespace Aftermath.Core
 {
@@ -52,7 +53,7 @@ namespace Aftermath.Core
         void _turnSystem_OnTurnAdvanced()
         {
             //advance the time of day each turn (minutes)
-            _world.TimeOfDay += 1;
+            _world.TimeOfDay += 10;
         }
 
         static Engine _instance;
@@ -130,8 +131,14 @@ namespace Aftermath.Core
             _turnSystem.RegisterCreature(_player);
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
-            
-            for (int i = 0; i < 50; i++)
+
+            //give the player a flashlight
+            //TODO refactor
+            _player.Flashlight = new PointLight(_player.Location, 4, new Color(1f,1f,0f));
+            _world.Lights.Add(_player.Flashlight);
+            _player.Flashlight.RecalculateLightfield();
+
+            for (int i = 0; i < 20; i++)
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();
@@ -168,23 +175,6 @@ namespace Aftermath.Core
         void KeyHandler(InputKey key)
         {
             GameState.CurrentState.ProcessKey(key);
-
-            //float cameraSpeed = 1f;
-            //switch (key)
-            //{
-            //    case InputKey.W:
-            //        _camera.Move(0, -cameraSpeed);
-            //        break;
-            //    case InputKey.A:
-            //        _camera.Move(-cameraSpeed, 0);
-            //        break;
-            //    case InputKey.S:
-            //        _camera.Move(0, cameraSpeed);
-            //        break;
-            //    case InputKey.D:
-            //        _camera.Move(cameraSpeed, 0);
-            //        break;
-            //}
         }
 
         public event EventHandler OnExit;
@@ -204,7 +194,7 @@ namespace Aftermath.Core
             //TODO put this into the player class?
             if (TurnSystem.MinorTurnNumber != _playerLastVisibleFilesFetchTime)
             {
-                _playerVisibleTiles = _player.GetVisibleTiles();
+                _playerVisibleTiles = _player.GetVisibleTiles(0.4f);
                 foreach (Tile visibleTile in _playerVisibleTiles)
                 {
                     _playerSeenTiles.Add(visibleTile);
@@ -253,14 +243,16 @@ namespace Aftermath.Core
 
                     bool isVisible = _playerVisibleTiles.Contains(tile);
                     bool hasSeen = _playerSeenTiles.Contains(tile);
+                    
+                    //obtain the lighting of this tile from the player's location
+                    Light light = tile.GetLighting(Engine.Instance.Player.Location);
+
                     //isVisible = true;
 
-                    if (tile != Player.Location && tile.LightLevel <= 0.1f)
-                        isVisible = false;
-                    
                     if (!isVisible && !hasSeen)
                         continue;
-                    _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
+
+                    _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), light.Color);
                     if (isVisible)
                     {
                         //draw corpse first
@@ -273,10 +265,8 @@ namespace Aftermath.Core
                         {
                             GameTexture texture = tile.Creature.Texture;
                             bool flipHorizontal = !tile.Creature.FacingRight;
-                            _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.5f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue, flipHorizontal);
+                            _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.3f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue, flipHorizontal);
                         }
-
-                        DrawTileOverlay(_renderer, tile, new Color(0.1f, 0.1f, 0, 1 - tile.LightLevel));
 
                         if (GameState.CurrentState == GameState.AimingState)
                         {
@@ -286,13 +276,9 @@ namespace Aftermath.Core
                     }
                     else
                     {
-                        DrawTileOverlay(_renderer, tile, new Color(0.1f, 0.1f, 0, 0.9f));
-
-
-                        //_renderer.Draw(_textureManager.GetTexture("overlay.gauze"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.5f));
-                    
-                        //tile not visible but remembered. Draw dark overlay.
-                        //_renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.5f));
+                        //tile not visible but remembered. Draw an overlay indicating that tile is not visible.
+                        //DrawTileOverlay(_renderer, tile, new Color(0f, 0f, 0, 0.9f));
+                        _renderer.Draw(_textureManager.GetTexture("overlay.gauze"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.3f));
                     }
                 }
 
@@ -348,7 +334,7 @@ namespace Aftermath.Core
 
         private void DrawTileOverlay(XnaRenderer renderer, Tile tile, Color color)
         {
-            renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(tile.X, tile.Y, 1, 1), 0.4f, 0, new Vector2F(0.5f, 0.5f), color);
+            renderer.Draw(_textureManager.GetTexture("overlay.white"), new RectangleF(tile.X, tile.Y, 1, 1), 0.4f, 0, new Vector2F(0.5f, 0.5f), color);
         }
 
         /// <summary>
