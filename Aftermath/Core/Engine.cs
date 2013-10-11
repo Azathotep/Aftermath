@@ -134,11 +134,11 @@ namespace Aftermath.Core
 
             //give the player a flashlight
             //TODO refactor
-            _player.Flashlight = new PointLight(_player.Location, 4, new Color(1f,1f,0f));
+            _player.Flashlight = new PointLight(_player.Location, 4, new Color(0.8f,0.8f,0.2f));
             _world.Lights.Add(_player.Flashlight);
             _player.Flashlight.RecalculateLightfield();
 
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 50; i++)
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();
@@ -226,10 +226,8 @@ namespace Aftermath.Core
             
             _renderer.Begin(world, projection, view);
 
-            //int width=20;
-            //int height = 14;
-            int width = 60;  //30;
-            int height = 40; // 20;
+            int width = 60;
+            int height = 40;
             //draw the viewable part of the map to the screen
             for (int y=(int)_camera.Position.Y - height;y<=_camera.Position.Y + height;y++)
                 for (int x = (int)_camera.Position.X - width; x <= _camera.Position.X + width; x++)
@@ -251,8 +249,14 @@ namespace Aftermath.Core
 
                     if (!isVisible && !hasSeen)
                         continue;
+                    Color color;
+                    //if the tile is visible then draw the color using the tile's light, otherwise draw it dark
+                    if (isVisible)
+                        color = light.Color;
+                    else
+                        color = new Color(0.1f,0.1f,0.1f);
 
-                    _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), light.Color);
+                    _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), color);
                     if (isVisible)
                     {
                         //draw corpse first

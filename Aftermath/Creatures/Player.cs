@@ -12,7 +12,7 @@ namespace Aftermath.Creatures
     {
         public Player()
         {
-            _health = 200;
+            _health = 50;
         }
 
         public override bool IsPlayerControlled

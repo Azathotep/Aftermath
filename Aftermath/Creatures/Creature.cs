@@ -243,9 +243,21 @@ namespace Aftermath.Creatures
 
         public Tile GetNextTileTowards(Tile tile)
         {
-            Tile[] tiles = _tile.GetTraversablePath(tile);
-            if (tiles.Length > 1)
-                return tiles[1];
+            var candidates = (from l in Location.GetNeighbours() select new { Distance = l.GetChebyshevDistanceFrom(tile), Tile = l }).OrderBy((a) => a.Distance);
+            foreach (var candidate in candidates)
+            {
+                Door door = candidate.Tile.Material as Door;
+                if (door == null && candidate.Tile.Material.IsOpaque)
+                    continue;
+
+                if (candidate.Tile.Creature != null)
+                {
+                    if (candidate.Tile.Creature == Engine.Instance.Player)
+                        return candidate.Tile;
+                    continue;
+                }
+                return candidate.Tile;
+            }
             return null;
         }
 

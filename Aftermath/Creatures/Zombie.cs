@@ -7,6 +7,7 @@ using Aftermath.AI;
 using Aftermath.Core;
 using Aftermath.Map;
 using Aftermath.Utils;
+using Aftermath.Lighting;
 
 namespace Aftermath.Creatures
 {
@@ -20,8 +21,8 @@ namespace Aftermath.Creatures
             _health = 20;
         }
 
-        const int ZombieIdleSightDistance = 6;
-        const int ZombieEnragedSightDistance = 12;
+        const int ZombieIdleSightDistance = 8;
+        const int ZombieEnragedSightDistance = 16;
 
         List<Human> VisibleHumans()
         {
@@ -129,7 +130,16 @@ namespace Aftermath.Creatures
                         if (tile.Creature != null && IsFood(tile.Creature))
                             Bite(tile);
                         else
-                            MoveTo(tile);
+                        {
+                            Door door = tile.Material as Door;
+                            if (door != null && !door.IsOpen)
+                            {
+                                door.IsOpen = true;
+                                
+                            }
+                            else
+                                MoveTo(tile);
+                        }
                     }
                     
                     //if rage level drops then switch back to idle state

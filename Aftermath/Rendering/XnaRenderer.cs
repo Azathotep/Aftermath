@@ -36,7 +36,7 @@ namespace Aftermath.Rendering
             _font = _contentManager.Load<SpriteFont>("Font");
         }
 
-        static Color ClearColor = new Color(50, 50, 50);
+        static Color ClearColor = new Color(0f, 0f, 0f);
         public void Clear()
         {
             _deviceManager.GraphicsDevice.Clear(ClearOptions.DepthBuffer | ClearOptions.Target, ClearColor, 1, 0);

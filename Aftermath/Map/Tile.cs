@@ -219,7 +219,7 @@ namespace Aftermath.Map
             {
                 totalBr = light.GetBrightnessAt(this);
                 Color lightColor = light.Color;
-                lightColor *= totalBr;
+                lightColor *= totalBr * 0.5f;
                 if (totalBr > 0)
                 {
                     _pointLighting.Color.R = (byte)Math.Min(_pointLighting.Color.R + lightColor.R, 255);
