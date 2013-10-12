@@ -3,14 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework;
-
 using Aftermath.Core;
 using Aftermath.Utils;
+using Aftermath.Animations;
 
 namespace Aftermath.Map
 {
+    /// <summary>
+    /// Base class for all materials
+    /// </summary>
     public abstract class TileMaterial
     {
+        //TODO several methods in the class take tile as a parameter. Should tile be passed in constructor instead?
+
         /// <summary>
         /// Returns the texture name for a tile with this tile type
         /// </summary>
@@ -50,6 +55,16 @@ namespace Aftermath.Map
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Applies damage to the material. Destructable materials should override this.
+        /// </summary>
+        /// <param name="tile">tile material is part of</param>
+        /// <param name="damageAmount">amount to damage the tile</param>
+        public virtual void Damage(Tile tile, int damageAmount)
+        {
+            
         }
     }
 
@@ -212,11 +227,37 @@ namespace Aftermath.Map
         {
             get
             {
+                if (_health <= 0)
+                    return true;
                 return _isOpen;
             }
-            set
+        }
+
+        public void Open()
+        {
+            if (_health <= 0)
+                return;
+            _isOpen = true;
+        }
+
+        public void Close()
+        {
+            if (_health <= 0)
+                return;
+            _isOpen = false;
+        }
+
+        int _health = 10;
+        public override void Damage(Tile tile, int damageAmount)
+        {
+            if (_health <= 0)
+                return;
+            _health -= damageAmount;
+            Engine.Instance.AnimationManager.StartAnimation(new BashAnimation(tile));
+            if (_health <= 0)
             {
-                _isOpen = value;
+                _isOpen = true;
+                _health = 0;
             }
         }
 

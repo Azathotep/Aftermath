@@ -103,7 +103,7 @@ namespace Aftermath.Creatures
         {
             if (tile.Material.IsDestructable)
             {
-                //TODO
+                tile.Material.Damage(tile, 2);
             }
             return false;
         }

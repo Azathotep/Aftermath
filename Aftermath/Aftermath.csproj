@@ -44,6 +44,7 @@
     <Compile Include="Animations\Animation.cs" />
     <Compile Include="Animations\AnimationManager.cs" />
     <Compile Include="Animations\BleedAnimation.cs" />
+    <Compile Include="Animations\BashAnimation.cs" />
     <Compile Include="Animations\MuzzleFlashAnimation.cs" />
     <Compile Include="Core\Camera.cs" />
     <Compile Include="Core\Engine.cs" />

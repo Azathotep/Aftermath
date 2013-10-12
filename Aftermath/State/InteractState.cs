@@ -27,7 +27,10 @@ namespace Aftermath.State
                 Door door = target.Material as Door;
                 if (door != null)
                 {
-                    door.IsOpen = !door.IsOpen;
+                    if (door.IsOpen)
+                        door.Close();
+                    else
+                        door.Open();
 
                     //if a door opens and closes need to update nearby light fields
                     //TODO redesign this, no need to update every light on the map
