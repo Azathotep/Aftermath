@@ -45,42 +45,69 @@ namespace Aftermath.Creatures
         }
 
         /// <summary>
+        /// Called when the creature bumps into a solid tile when moving. Can be overriden to eg bash the obstacle.
+        /// If the response is not handled then it is assumed the tile blocked the crature.
+        /// </summary>
+        /// <param name="tile">tile bumped into</param>
+        /// <returns>true if the creature handled the bump, false if it did not.</returns>
+        protected virtual bool OnBump(Tile tile)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Called when the creature bumps into another creature when moving. Can be overriden to eg bite the creature
+        /// or swap places with it.
+        /// </summary>
+        /// <param name="creature">Creature bumped into</param>
+        /// <returns>true if the bump is handled, false if it isn't</returns>
+        protected virtual bool OnBump(Creature creature)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Moves the creature towards the specified tile
+        /// </summary>
+        /// <param name="target">target tile</param>
+        protected ActionResult MoveTowards(Tile target)
+        {
+            var candidates = (from n in Location.GetNeighbours() orderby n.GetChebyshevDistanceFrom(target) select n);
+            foreach (var tile in candidates)
+            {
+                ActionResult result = MoveTo(tile);
+                if (result == ActionResult.Ok)
+                    return ActionResult.Ok;
+            }
+            return ActionResult.No;
+        }
+
+        /// <summary>
         /// Moves the creature from its current tile to a new tile. The operation can fail if
         /// the tile is blocked or already occupied.
         /// </summary>
         /// <returns>Indicates whether the action succeeded and if not, why not</returns>
-        public virtual ActionResult MoveTo(Tile targetTile)
+        protected ActionResult MoveTo(Tile targetTile)
         {
             if (targetTile == null)
                 return ActionResult.TileBlocked;
             //face the attempted direction of movement
             Face(targetTile);
 
-            //check whether the tile allows the creature to enter.
-            ActionResult res = targetTile.CanEnter(this);
-            if (res == ActionResult.TileOccupied)
+            if (targetTile.Material.IsSolid)
             {
-                //TODO tile is occupied by another creature, so convert movement into a bumb melee attack
-                //res = CanAttack(targetTile);
-                //if (res == ActionResult.Ok)
-                //    MeleeAttack(targetTile);
-                return res;
+                bool handled = OnBump(targetTile);
+                if (handled)
+                    return ActionResult.Ok;
+                return ActionResult.TileBlocked;
             }
-            //if tile itself blocks (eg it's solid)
-            if (res == ActionResult.TileBlocked)
+
+            if (targetTile.Creature != null)
             {
-                //bump into the target tile. Tiles can have effects when bumped into (eg pulling a lever or
-                //putting out a light, opening a door) which may use up the turn.
-                //if (targetTile.OnBump(this))
-                //{
-                //    res = ActionResult.Ok;
-                //    EndTurn();
-                //}
-                //else
-                {
-                    //TODO if the player is moving into a wall put out a message? eg "the wall is unmovable"
-                }
-                return res;
+                bool handled = OnBump(targetTile.Creature);
+                if (handled)
+                    return ActionResult.Ok;
+                return ActionResult.TileOccupied;
             }
 
             //Tile.OnExit(this);
@@ -234,12 +261,14 @@ namespace Aftermath.Creatures
         /// <summary>
         /// Calculates the best path to reach the specified tile and takes the first step
         /// </summary>
-        public void MoveTowards(Tile tile)
-        {
-            Tile[] tiles = _tile.GetTraversablePath(tile);
-            if (tiles.Length > 1)
-                MoveTo(tiles[1]);
-        }
+        //public void MoveTowards(Tile tile)
+        //{
+        //    Tile tile = GetNextTileTowards(tile);
+        //    MoveTo(tile);
+        //    Tile[] tiles = _tile.GetTraversablePath(tile);
+        //    if (tiles.Length > 1)
+        //        MoveTo(tiles[1]);
+        //}
 
         public Tile GetNextTileTowards(Tile tile)
         {

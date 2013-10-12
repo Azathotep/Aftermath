@@ -277,9 +277,9 @@ namespace Aftermath.Core
                             if (zombie != null)
                             {
                                 string icon = "";
-                                if (zombie.IsAlerted)
+                                if (zombie.State == ZombieState.Alert)
                                     icon = "overlay.warning";
-                                else if (zombie.IsEnraged)
+                                else if (zombie.State == ZombieState.Enraged)
                                     icon = "overlay.danger";
                                 if (icon != "")
                                     _renderer.Draw(_textureManager.GetTexture(icon), new RectangleF(x, y-0.8f, 0.5f, 0.5f), 0.2f, 0, new Vector2F(0.5f, 0.5f));

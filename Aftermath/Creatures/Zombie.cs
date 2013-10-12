@@ -13,26 +13,35 @@ namespace Aftermath.Creatures
 {
     class Zombie : Creature
     {
+        const int ZombieDefaultSightDistance = 8;
+        const int ZombieEnragedSightDistance = 16;
         static int playermap_generatedTime = -1;
         static HomingField playermap=null;
+
+        byte _rageLevel = 0;
+        ZombieState _state = ZombieState.Idle;
+        Tile _targetTile;
 
         public Zombie()
         {
             _health = 20;
         }
-
-        const int ZombieDefaultSightDistance = 8;
-        const int ZombieEnragedSightDistance = 16;
-
+        
+        /// <summary>
+        /// Returns the nearest visible human
+        /// </summary>
         Human GetNearestVisibleHuman()
         {
-            var targets = VisibleHumans();
+            var targets = GetVisibleHumans();
             if (targets.Count > 0)
                 return targets[0];
             return null;
         }
 
-        List<Human> VisibleHumans()
+        /// <summary>
+        /// Returns a list of all visible humans
+        /// </summary>
+        List<Human> GetVisibleHumans()
         {
             List<Human> ret = new List<Human>();
             List<Human> nearbyHumans = new List<Human>();
@@ -53,199 +62,201 @@ namespace Aftermath.Creatures
             return ret;
         }
 
-        enum ZombieState
+        void BecomeAlert()
         {
-            Idle,
-            Stare,
-            Enraged
-        }
-
-        byte _rageLevel = 0;
-
-        ZombieState _state = ZombieState.Idle;
-
-        Human _target;
-        Tile _targetTile;
-
-        void BeginStare()
-        {
-            _state = ZombieState.Stare;
+            _state = ZombieState.Alert;
             _rageLevel = 4;
         }
 
-        void BeginIdle()
+        void BecomeIdle()
         {
             _state = ZombieState.Idle;
         }
 
-        void BeginEnraged()
+        void BecomeEnraged()
         {
             _state = ZombieState.Enraged;
             _rageLevel = 50;
         }
 
-        bool _skipNextTurn = false;
+        /// <summary>
+        /// Called when the zombie bumps into another creature while trying to move
+        /// </summary>
+        /// <param name="creature">the creature bumped into</param>
+        /// <returns>true if the bump was handled, false otherwise</returns>
+        protected override bool OnBump(Creature creature)
+        {
+            if (IsFood(creature))
+            {
+                Bite(creature.Location);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Called when the zombie bumps into a solid tile while moving
+        /// </summary>
+        /// <param name="tile">the tile bumped into</param>
+        /// <returns>true if this event is handled</returns>
+        protected override bool OnBump(Tile tile)
+        {
+            if (tile.Material.IsDestructable)
+            {
+                //TODO
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// AI logic when the zombie is enraged
+        /// </summary>
+        void OnEnraged()
+        {
+            Human target = GetNearestVisibleHuman();
+            //if a human is visible then recharge rage
+            if (target != null)
+            {
+                _rageLevel = 50;
+                _targetTile = target.Location;
+            }
+            else
+            {
+                //reduce rage if target is not visible
+                _rageLevel--;
+                if (_rageLevel == 0)
+                {
+                    BecomeIdle();
+                    return;
+                }
+            }
+
+            //if zombie has a target then move towards it
+            if (_targetTile != null)
+            {
+                //if already at the target tile then drop target
+                if (Location == _targetTile)
+                    _targetTile = null;
+                else
+                {
+                    //move towards target tile
+                    MoveTowards(_targetTile);
+                    return;
+                }
+            }
+
+            Tile scent = GetNextTileInScentTrail();
+            if (scent != null)
+                MoveTo(scent);
+        }
+
+        /// <summary>
+        /// AI logic when the zombie is in idle state
+        /// </summary>
+        void OnIdle()
+        {
+            //keep a look out for humans
+            Human target = GetNearestVisibleHuman();
+            if (target != null)
+            {
+                //something spotted, go into alert state
+                _targetTile = target.Location;
+                BecomeAlert();
+                return;
+            }
+
+            //no humans visible
+            //check sound
+
+            //check smell
+            Tile scentTarget = GetNextTileInScentTrail();
+            if (scentTarget != null)
+            {
+                //slowly follow scent trail
+                if (Dice.Next(2) == 0)
+                    MoveTo(scentTarget);
+                return;
+            }
+
+            //if have a previously remembered target tile then move towards that
+            if (_targetTile != null)
+            {
+                MoveTowards(_targetTile);
+                return;
+            }
+
+            //wander randomly
+            if (Dice.Next(3) == 0)
+                Move(Compass.GetRandomCompassDirection());
+        }
+
+        /// <summary>
+        /// AI logic when zombie is in alert state
+        /// </summary>
+        void OnAlert()
+        {
+            //zombie has spotted a human but it takes a while to realize
+            Human target = GetNearestVisibleHuman();
+            if (target == null)
+            {
+                //if cannot see anyone then rage down and eventually switch to idle
+                _rageLevel--;
+                if (_rageLevel == 0)
+                {
+                    BecomeIdle();
+                    return;
+                }
+            }
+            else
+            {
+                //if a target is near enough then enrage instantly
+                if (Location.GetChebyshevDistanceFrom(target.Location) < 4)
+                    _rageLevel += 10;
+                else
+                    _rageLevel += 2;
+                if (_rageLevel > 10)
+                {
+                    _targetTile = target.Location;
+                    BecomeEnraged();
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called once per zombie turn for the zombie to perform a turn action
+        /// </summary>
         public override void DoTurn()
         {
-            Human target;
+            //action depends on state
             switch (_state)
             {
                 //when zombie is idle it slowly shuffles around
                 //if a player gets to close it rages
                 case ZombieState.Idle:
-
-                    target = GetNearestVisibleHuman();
-                    if (target != null)
-                    {
-                        _targetTile = target.Location;
-                        BeginStare();
-                        break;
-                    }
-
-                    //check sound
-
-                    //check smell
-                    Tile scentTarget = GetNextTileInScentTrail();
-                    if (scentTarget != null)
-                    {
-                        if (Dice.Next(2) == 0)
-                            MoveTowards(scentTarget);
-                        return;
-                    }
-
-                    if (_targetTile != null)
-                    {
-                        MoveTowards(_targetTile);
-                        return;
-                    }
-
-                    if (Dice.Next(3) == 0)
-                        Move(Compass.GetRandomCompassDirection());
+                    OnIdle();
                     break;
-                case ZombieState.Stare:
-                    //zombie has spotted a human but it takes a while to realize
-                    target = GetNearestVisibleHuman();
-                    if (target == null)
-                    {
-                        _rageLevel--;
-                        if (_rageLevel == 0)
-                        {
-                            BeginIdle();
-                            return;
-                        }
-                    }
-                    else
-                    {
-                        if (Location.GetChebyshevDistanceFrom(target.Location) < 4)
-                            _rageLevel += 10;
-                        else
-                            _rageLevel += 2;
-                        if (_rageLevel > 10)
-                        {
-                            _targetTile = target.Location;
-                            BeginEnraged();
-                            return;
-                        }
-                    }
+                case ZombieState.Alert:
+                    OnAlert();
                     break;
                 case ZombieState.Enraged:
-                    target = GetNearestVisibleHuman();
-                    if (target != null)
-                    {
-                        _rageLevel = 50;
-                        _targetTile = target.Location;
-                    }
-                    else
-                    {
-                        _rageLevel--;
-                        if (_rageLevel == 0)
-                        {
-                            BeginIdle();
-                            return;
-                        }
-                    }
-
-                    if (_targetTile != null)
-                    {
-                        //if already at the last seen tile and can't see target then target has been lost
-                        if (Location == _targetTile)
-                        {
-                            _targetTile = null;
-                        }
-                        else
-                        {
-                            Tile tile = GetNextTileTowards(_targetTile);
-                            if (tile == null)
-                                return;
-                            if (tile.Creature != null && IsFood(tile.Creature))
-                                Bite(tile);
-                            else
-                            {
-                                Door door = tile.Material as Door;
-                                if (door != null && !door.IsOpen)
-                                {
-                                    door.IsOpen = true;
-
-                                }
-                                else
-                                    MoveTo(tile);
-                            }
-                            return;
-                        }
-                    }
-
-                    Tile scent = GetNextTileInScentTrail();
-                    if (scent != null)
-                        MoveTowards(scent);
+                    OnEnraged();
                     break;
             }
-            return;
-
-            if (Engine.Instance.TurnSystem.TurnNumber != playermap_generatedTime)
-            {
-                playermap = new HomingField(Engine.Instance.World, 30, 30); //50, 50);
-                playermap.CenterOn(Engine.Instance.Player.Location);
-                playermap.SetHomingTarget(Engine.Instance.Player.Location);
-                playermap.Generate();
-                playermap_generatedTime = Engine.Instance.TurnSystem.TurnNumber;
-            }
-
-            //skip every other turn, makes zombies slow
-            if (_skipNextTurn)
-            {
-                _skipNextTurn = false;
-                return;
-            }
-
-            Tile next = playermap.GetNext(Location);
-            if (next == null)
-            {
-                //if there is no path to follow then move randomly
-                Move(Compass.GetRandomCompassDirection());
-            }
-            else
-            {
-                //there is a path to follow and the tile is unblocked move there
-                if (next.Creature == null)
-                {
-                    MoveTo(next);
-                }
-                else
-                {
-                    //a creature blocks the path. If it's food then bite it, otherwise move randomly
-                    if (IsFood(next.Creature))
-                        Bite(next);
-                    else
-                        Move(Compass.GetRandomCompassDirection());
-                }                 
-            }
-                
-            //zombies somehow know where the player is and chase
-            //MoveTowards(Aftermath.Core.Engine.Instance.Player.Tile);
-            //_skipNextTurn = true;
-            //Move(Compass.GetRandomCompassDirection());
+            //if (Engine.Instance.TurnSystem.TurnNumber != playermap_generatedTime)
+            //{
+            //    playermap = new HomingField(Engine.Instance.World, 30, 30); //50, 50);
+            //    playermap.CenterOn(Engine.Instance.Player.Location);
+            //    playermap.SetHomingTarget(Engine.Instance.Player.Location);
+            //    playermap.Generate();
+            //    playermap_generatedTime = Engine.Instance.TurnSystem.TurnNumber;
+            //}
         }
 
+        /// <summary>
+        /// Returns true if the specified creature is food, ie attackable
+        /// </summary>
+        /// <param name="other">creature to test</param>
         bool IsFood(Creature other)
         {
             if (other == Engine.Instance.Player)
@@ -264,12 +275,16 @@ namespace Aftermath.Creatures
             EndTurn();
         }
 
+        /// <summary>
+        /// Returns the texture to draw this zombie
+        /// </summary>
         public override GameTexture Texture
         {
             get
             {
                 if (IsAlive)
                 {
+                    //TODO get textures from manager and don't heap allocate every frame
                     if (_health <= 10)
                         return new GameTexture("zombieInjured", new RectangleI(0, 0, 64, 64));
                     return new GameTexture("zombie", new RectangleI(0, 0, 64, 64));
@@ -279,20 +294,19 @@ namespace Aftermath.Creatures
             }
         }
 
-        public bool IsAlerted 
+        public ZombieState State
         {
             get
             {
-                return _state == ZombieState.Stare;
+                return _state;
             }
         }
+    }
 
-        public bool IsEnraged 
-        { 
-            get
-            {
-                return _state == ZombieState.Enraged;
-            }
-        }
+    enum ZombieState
+    {
+        Idle,
+        Alert,
+        Enraged
     }
 }

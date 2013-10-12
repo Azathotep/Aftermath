@@ -40,6 +40,17 @@ namespace Aftermath.Map
                 return false;
             }
         }
+
+        /// <summary>
+        /// Returns whether this material can be destroyed
+        /// </summary>
+        public virtual bool IsDestructable 
+        {
+            get
+            {
+                return false;
+            }
+        }
     }
 
     class Wall : TileMaterial
@@ -206,6 +217,14 @@ namespace Aftermath.Map
             set
             {
                 _isOpen = value;
+            }
+        }
+
+        public override bool IsDestructable
+        {
+            get
+            {
+                return true;
             }
         }
     }
