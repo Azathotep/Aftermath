@@ -52,7 +52,6 @@ namespace Aftermath.Core
 
         void _turnSystem_OnTurnAdvanced()
         {
-            _world.TimeOfDay = 12 * 60;
             //advance the time of day each turn (minutes)
             _world.TimeOfDay += 1;
         }
@@ -132,6 +131,8 @@ namespace Aftermath.Core
             _turnSystem.RegisterCreature(_player);
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
+
+            _world.TimeOfDay = 12 * 60;
 
             //give the player a flashlight
             //TODO refactor
@@ -214,7 +215,7 @@ namespace Aftermath.Core
             Rectangle tileRangeToDraw = new Rectangle((int)topLeft.X - 1, (int)topLeft.Y - 1, (int)bottomRight.X - (int)topLeft.X + 2, (int)bottomRight.Y - (int)topLeft.Y + 2);
 
             Matrix world = Matrix.Identity;
-            Matrix projection = Matrix.CreateOrthographic(50, 40, -1000.5f, 100); //30, 24, -1000.5f, 100);
+            Matrix projection = Matrix.CreateOrthographic(50, 40, -1000.5f, 100); //50, 40, -1000.5f, 100); //
             if (!Engine.Instance.Player.IsAlive)
             {
                 projection = Matrix.CreateOrthographic(30 - 15 * _zoomAmt, 24 - 12 * _zoomAmt, -1000.5f, 100);
@@ -227,8 +228,8 @@ namespace Aftermath.Core
             
             _renderer.Begin(world, projection, view);
 
-            int width = 60;
-            int height = 40;
+            int width = 50;  //60;
+            int height = 40; // 40;
             //draw the viewable part of the map to the screen
             for (int y=(int)_camera.Position.Y - height;y<=_camera.Position.Y + height;y++)
                 for (int x = (int)_camera.Position.X - width; x <= _camera.Position.X + width; x++)
@@ -273,17 +274,16 @@ namespace Aftermath.Core
                             _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.3f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue, flipHorizontal);
 
                             Zombie zombie = tile.Creature as Zombie;
-                            if (zombie != null && zombie.IsAlerted)
+                            if (zombie != null)
                             {
-                                _renderer.Draw(_textureManager.GetTexture("overlay.warning"), new RectangleF(x, y-0.8f, 0.5f, 0.5f), 0.2f, 0, new Vector2F(0.5f, 0.5f));
+                                string icon = "";
+                                if (zombie.IsAlerted)
+                                    icon = "overlay.warning";
+                                else if (zombie.IsEnraged)
+                                    icon = "overlay.danger";
+                                if (icon != "")
+                                    _renderer.Draw(_textureManager.GetTexture(icon), new RectangleF(x, y-0.8f, 0.5f, 0.5f), 0.2f, 0, new Vector2F(0.5f, 0.5f));
                             }
-                        
-                        }
-
-                        if (GameState.CurrentState == GameState.AimingState)
-                        {
-                            if (_playerVisibleTiles.Contains(tile) && _player.SelectedGun.CanReach(tile))
-                                _renderer.Draw(_textureManager.GetTexture("steel.floor"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0.2f, 0, 0.005f));
                         }
                     }
                     else
@@ -366,9 +366,6 @@ namespace Aftermath.Core
             //TODO refactor
             bool validTarget = true;
             if (!_playerVisibleTiles.Contains(_targetingModule.Tile))
-                validTarget = false;
-            bool canReach = _player.SelectedGun.CanReach(_targetingModule.Tile);
-            if (!canReach)
                 validTarget = false;
 
             if (!validTarget)

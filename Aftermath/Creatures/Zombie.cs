@@ -286,5 +286,13 @@ namespace Aftermath.Creatures
                 return _state == ZombieState.Stare;
             }
         }
+
+        public bool IsEnraged 
+        { 
+            get
+            {
+                return _state == ZombieState.Enraged;
+            }
+        }
     }
 }

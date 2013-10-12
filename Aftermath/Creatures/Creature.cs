@@ -169,7 +169,7 @@ namespace Aftermath.Creatures
         public HashSet<Creature> GetVisibleCreatures()
         {
             HashSet<Creature> ret = new HashSet<Creature>();
-            foreach (Tile tile in GetVisibleTiles())
+            foreach (Tile tile in GetVisibleTiles(0.4f))
                 if (tile.Creature != null && tile.Creature != this)
                     ret.Add(tile.Creature);
             return ret;
@@ -271,14 +271,6 @@ namespace Aftermath.Creatures
 
         public class Gun
         {
-            internal int MaxRange
-            {
-                get
-                {
-                    return 5;
-                }
-            }
-
             /// <summary>
             /// The current owner of the gun. This method allows the position of the gun to be obtained.
             /// </summary>
@@ -290,16 +282,9 @@ namespace Aftermath.Creatures
 
             public int LoadedAmmo = 6;
 
-            internal bool CanReach(Tile targetTile)
-            {
-                return Owner.Location.GetChebyshevDistanceFrom(targetTile) <= MaxRange;
-            }
-
             internal bool Fire(Creature firer, Tile targetTile)
             {
                 if (LoadedAmmo < 0)
-                    return false;
-                if (!CanReach(targetTile))
                     return false;
                 LoadedAmmo--;
                 Engine.Instance.AnimationManager.StartAnimation(new MuzzleFlashAnimation(firer));

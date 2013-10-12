@@ -55,13 +55,6 @@ namespace Aftermath.Input
         {
             HashSet<Creature> visibleCreatures = targeter.GetVisibleCreatures();
 
-            //if the current target is out of range of the weapon then reset target
-            if (Tile != null && !targeter.SelectedGun.CanReach(Tile))
-            {
-                _targetedTile = null;
-                _targetedCreature = null;
-            }
-
             //if a currently targetted creature is still visible (and alive) then keep that as the target
             if (_targetedCreature != null && _targetedCreature.IsAlive && visibleCreatures.Contains(_targetedCreature))
                 return;
@@ -74,7 +67,7 @@ namespace Aftermath.Input
             //module has no target or an invalid target so aquire a new target
             //go for the nearest living creature in range
             Creature nearestTarget = (from c in visibleCreatures where c.IsAlive orderby c.Location.GetChebyshevDistanceFrom(targeter.Location) select c).FirstOrDefault();
-            if (nearestTarget == null || !targeter.SelectedGun.CanReach(nearestTarget.Location))
+            if (nearestTarget == null)
             {
                 //no available target so reset crosshair to owner's tile
                 _targetedTile = null;
