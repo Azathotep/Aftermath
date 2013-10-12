@@ -72,13 +72,23 @@ namespace Aftermath.Creatures
                     if (targets.Count == 0)
                     {
                         _rageLevel = 0;
+
+                        if (Location.ScentLevel > 0)
+                        {
+                            Tile target = GetNextTileInScentTrail();
+                            if (target != null)
+                            {
+                                MoveTowards(target);
+                                return;
+                            }
+                        }
                         //shamble about randomly
                         if (Dice.Next(3) == 0)
                             Move(Compass.GetRandomCompassDirection());
                         return;
                     }
                     //increment rage count until enraged. Probably want to rage faster when really close
-                    _rageLevel++;
+                    //_rageLevel++;
                     if (_rageLevel > 3)
                     {
                         _rageLevel = 20;
@@ -120,7 +130,12 @@ namespace Aftermath.Creatures
                         _targetTile = _target.Location;
                     }
 
-                    //if no target then just stand there angry until a new target is aquired
+                    //if no target then follow smell
+                    if (_targetTile == null)
+                    {
+                        _targetTile = GetNextTileInScentTrail();
+                    }
+                    
                     //move towards target
                     if (_targetTile != null)
                     {
@@ -197,8 +212,6 @@ namespace Aftermath.Creatures
             //_skipNextTurn = true;
             //Move(Compass.GetRandomCompassDirection());
         }
-
-        //hello  //hello BACK!!!
 
         bool IsFood(Creature other)
         {

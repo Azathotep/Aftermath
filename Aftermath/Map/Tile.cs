@@ -324,5 +324,23 @@ namespace Aftermath.Map
                 return Light.PitchBlack;
             return n.TotalLighting;
         }
+
+        int _scent=0;
+        public int ScentLevel
+        {
+            get
+            {
+                return Math.Max(0, _scent - Engine.Instance.TurnSystem.TurnNumber);
+            }
+        }
+
+        /// <summary>
+        /// Drops scent marker on this tile
+        /// </summary>
+        /// <param name="lifetime">The lifetime of the scent marker</param>
+        internal void DropScent(int lifetime)
+        {
+            _scent = Engine.Instance.TurnSystem.TurnNumber + lifetime;
+        }
     }
 }

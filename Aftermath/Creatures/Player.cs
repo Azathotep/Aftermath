@@ -39,6 +39,9 @@ namespace Aftermath.Creatures
             //refactor this
             Flashlight.Location = Location;
             Flashlight.RecalculateLightfield();
+
+            Location.DropScent(500);
+
             base.PostTurn();
         }
 

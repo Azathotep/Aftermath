@@ -261,6 +261,14 @@ namespace Aftermath.Creatures
             return null;
         }
 
+        protected Tile GetNextTileInScentTrail()
+        {
+            Tile smelliestNeighbour = (from n in Location.GetNeighbours() orderby n.ScentLevel descending select n).FirstOrDefault();
+            if (smelliestNeighbour.ScentLevel > Location.ScentLevel)
+                return smelliestNeighbour;
+            return null;
+        }
+
         public class Gun
         {
             internal int MaxRange

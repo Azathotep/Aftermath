@@ -52,8 +52,9 @@ namespace Aftermath.Core
 
         void _turnSystem_OnTurnAdvanced()
         {
+            _world.TimeOfDay = 12 * 60;
             //advance the time of day each turn (minutes)
-            _world.TimeOfDay += 10;
+            _world.TimeOfDay += 1;
         }
 
         static Engine _instance;
