@@ -271,6 +271,13 @@ namespace Aftermath.Core
                             GameTexture texture = tile.Creature.Texture;
                             bool flipHorizontal = !tile.Creature.FacingRight;
                             _renderer.Draw(texture, new RectangleF(x, y, 1, 1), 0.3f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue, flipHorizontal);
+
+                            Zombie zombie = tile.Creature as Zombie;
+                            if (zombie != null && zombie.IsAlerted)
+                            {
+                                _renderer.Draw(_textureManager.GetTexture("overlay.warning"), new RectangleF(x, y-0.8f, 0.5f, 0.5f), 0.2f, 0, new Vector2F(0.5f, 0.5f));
+                            }
+                        
                         }
 
                         if (GameState.CurrentState == GameState.AimingState)

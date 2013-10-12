@@ -21,8 +21,16 @@ namespace Aftermath.Creatures
             _health = 20;
         }
 
-        const int ZombieIdleSightDistance = 8;
+        const int ZombieDefaultSightDistance = 8;
         const int ZombieEnragedSightDistance = 16;
+
+        Human GetNearestVisibleHuman()
+        {
+            var targets = VisibleHumans();
+            if (targets.Count > 0)
+                return targets[0];
+            return null;
+        }
 
         List<Human> VisibleHumans()
         {
@@ -34,10 +42,10 @@ namespace Aftermath.Creatures
                 HashSet<Tile> tiles = Engine.Instance.Player.ZombieViewField;
                 if (!tiles.Contains(Location))
                     continue;
-                int sightRange = ZombieEnragedSightDistance;
+                int sightRange = ZombieDefaultSightDistance;
                 //idle zombies have lower sight range
-                if (_state == ZombieState.Idle)
-                    sightRange = ZombieIdleSightDistance;
+                if (_state == ZombieState.Enraged)
+                    sightRange = ZombieEnragedSightDistance;
                 if (Location.GetChebyshevDistanceFrom(human.Location) > sightRange)
                     continue;
                 ret.Add(human);
@@ -48,6 +56,7 @@ namespace Aftermath.Creatures
         enum ZombieState
         {
             Idle,
+            Stare,
             Enraged
         }
 
@@ -58,112 +67,136 @@ namespace Aftermath.Creatures
         Human _target;
         Tile _targetTile;
 
+        void BeginStare()
+        {
+            _state = ZombieState.Stare;
+            _rageLevel = 4;
+        }
+
+        void BeginIdle()
+        {
+            _state = ZombieState.Idle;
+        }
+
+        void BeginEnraged()
+        {
+            _state = ZombieState.Enraged;
+            _rageLevel = 50;
+        }
+
         bool _skipNextTurn = false;
         public override void DoTurn()
         {
+            Human target;
             switch (_state)
             {
                 //when zombie is idle it slowly shuffles around
                 //if a player gets to close it rages
                 case ZombieState.Idle:
-                    //look for visible targets
-                    List<Human> targets = VisibleHumans();
-                    //if there are no targets then move randomly
-                    if (targets.Count == 0)
-                    {
-                        _rageLevel = 0;
 
-                        if (Location.ScentLevel > 0)
-                        {
-                            Tile target = GetNextTileInScentTrail();
-                            if (target != null)
-                            {
-                                MoveTowards(target);
-                                return;
-                            }
-                        }
-                        //shamble about randomly
-                        if (Dice.Next(3) == 0)
-                            Move(Compass.GetRandomCompassDirection());
+                    target = GetNearestVisibleHuman();
+                    if (target != null)
+                    {
+                        _targetTile = target.Location;
+                        BeginStare();
+                        break;
+                    }
+
+                    //check sound
+
+                    //check smell
+                    Tile scentTarget = GetNextTileInScentTrail();
+                    if (scentTarget != null)
+                    {
+                        if (Dice.Next(2) == 0)
+                            MoveTowards(scentTarget);
                         return;
                     }
-                    //increment rage count until enraged. Probably want to rage faster when really close
-                    //_rageLevel++;
-                    if (_rageLevel > 3)
+
+                    if (_targetTile != null)
                     {
-                        _rageLevel = 20;
-                        //TODO change to pick nearest target?
-                        Human target = targets[0];
-                        //become enraged and run at the target
-                        _state = ZombieState.Enraged;
-                        _target = target;
-                        _targetTile = target.Location;
+                        MoveTowards(_targetTile);
+                        return;
+                    }
+
+                    if (Dice.Next(3) == 0)
+                        Move(Compass.GetRandomCompassDirection());
+                    break;
+                case ZombieState.Stare:
+                    //zombie has spotted a human but it takes a while to realize
+                    target = GetNearestVisibleHuman();
+                    if (target == null)
+                    {
+                        _rageLevel--;
+                        if (_rageLevel == 0)
+                        {
+                            BeginIdle();
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (Location.GetChebyshevDistanceFrom(target.Location) < 4)
+                            _rageLevel += 10;
+                        else
+                            _rageLevel += 2;
+                        if (_rageLevel > 10)
+                        {
+                            _targetTile = target.Location;
+                            BeginEnraged();
+                            return;
+                        }
                     }
                     break;
                 case ZombieState.Enraged:
-                    List<Human> visibleHumans = VisibleHumans();
-                    //maximum rage while humans are visible else range falls
-                    if (visibleHumans.Count > 0)
-                        _rageLevel = 20;
-                    else
-                        _rageLevel--;
-
-                    //chase target
-                    if (_target != null)
+                    target = GetNearestVisibleHuman();
+                    if (target != null)
                     {
-                        if (visibleHumans.Contains(_target))
-                            _targetTile = _target.Location;
-                        else
+                        _rageLevel = 50;
+                        _targetTile = target.Location;
+                    }
+                    else
+                    {
+                        _rageLevel--;
+                        if (_rageLevel == 0)
                         {
-                            //if already at the last seen tile and can't see target then target has been lost
-                            if (Location == _targetTile)
-                            {
-                                _target = null;
-                                _targetTile = null;
-                            }
+                            BeginIdle();
+                            return;
                         }
                     }
 
-                    if (_target == null && visibleHumans.Count > 0)
-                    {
-                        _target = visibleHumans[0];
-                        _targetTile = _target.Location;
-                    }
-
-                    //if no target then follow smell
-                    if (_targetTile == null)
-                    {
-                        _targetTile = GetNextTileInScentTrail();
-                    }
-                    
-                    //move towards target
                     if (_targetTile != null)
                     {
-                        Tile tile = GetNextTileTowards(_targetTile);
-                        if (tile == null)
-                            return;
-                        if (tile.Creature != null && IsFood(tile.Creature))
-                            Bite(tile);
+                        //if already at the last seen tile and can't see target then target has been lost
+                        if (Location == _targetTile)
+                        {
+                            _targetTile = null;
+                        }
                         else
                         {
-                            Door door = tile.Material as Door;
-                            if (door != null && !door.IsOpen)
-                            {
-                                door.IsOpen = true;
-                                
-                            }
+                            Tile tile = GetNextTileTowards(_targetTile);
+                            if (tile == null)
+                                return;
+                            if (tile.Creature != null && IsFood(tile.Creature))
+                                Bite(tile);
                             else
-                                MoveTo(tile);
+                            {
+                                Door door = tile.Material as Door;
+                                if (door != null && !door.IsOpen)
+                                {
+                                    door.IsOpen = true;
+
+                                }
+                                else
+                                    MoveTo(tile);
+                            }
+                            return;
                         }
                     }
-                    
-                    //if rage level drops then switch back to idle state
-                    if (_rageLevel == 0)
-                    {
-                        _target = null;
-                        _targetTile = null;
-                        _state = ZombieState.Idle;
-                    }
+
+                    Tile scent = GetNextTileInScentTrail();
+                    if (scent != null)
+                        MoveTowards(scent);
                     break;
             }
             return;
@@ -243,6 +276,14 @@ namespace Aftermath.Creatures
                 }
                 else
                     return new GameTexture("zombie_dead", new RectangleI(0, 0, 64, 64));
+            }
+        }
+
+        public bool IsAlerted 
+        {
+            get
+            {
+                return _state == ZombieState.Stare;
             }
         }
     }
