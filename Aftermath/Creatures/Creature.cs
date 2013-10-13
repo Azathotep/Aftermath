@@ -317,6 +317,7 @@ namespace Aftermath.Creatures
                     return false;
                 LoadedAmmo--;
                 Engine.Instance.AnimationManager.StartAnimation(new MuzzleFlashAnimation(firer));
+                Sound.Emit(Core.Engine.Instance.Player.Location, 20);
                 if (targetTile.Creature != null)
                     targetTile.Creature.PutDamage(10);
                 return true;
@@ -363,6 +364,12 @@ namespace Aftermath.Creatures
         public virtual void PostTurn()
         {
             
+        }
+
+        protected Sound _heardSound;
+        public virtual void Hear(Sound sound)
+        {
+            _heardSound = sound;
         }
     }
 

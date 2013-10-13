@@ -134,19 +134,6 @@ namespace Aftermath.Map
             creature.Place(this);
         }
 
-        /// <summary>
-        /// Returns whether a specified creature can enter this tile
-        /// </summary>
-        /// <returns>Whether a creature can enter this tile and if not, why not</returns>
-        internal ActionResult CanEnter(Creature creature)
-        {
-            if (Creature != null)
-                return ActionResult.TileOccupied;
-            if (Material.IsSolid)
-                return ActionResult.TileBlocked;
-            return ActionResult.Ok;
-        }
-
         internal int GetManhattenDistanceFrom(Tile other)
         {
             return Math.Abs(other.X - X) + Math.Abs(other.Y - Y);

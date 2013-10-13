@@ -6,8 +6,6 @@ using Aftermath.Map;
 
 namespace Aftermath.AI
 {
-
-    //I like logic
     /// <summary>
     /// Generates a field that can be used by zombies to home in on targets. Zombies can share the same field which allows the number
     /// of zombies to be increased. The city map is too big to generate a field for the entire map. A field is generated around the 
@@ -16,121 +14,75 @@ namespace Aftermath.AI
     /// </summary>
     public class HomingField
     {
-        World _world;
-        int[,] _map;
-
-        int _x, _y;
-        int _width, _height;
-        public HomingField(World world, int width, int height)
-        {
-            _world = world;
-            _width = width;
-            _height = height;
-            //initialize field with high values
-            _map = new int[width, height];
-            for (int y = 0; y < _height; y++)
-                for (int x = 0; x < _width; x++)
-                    _map[x, y] = 9999;
-        }
-
         /// <summary>
         /// Sets a tile as a homing target. After generating the field can be used to home on these targets
         /// </summary>
         /// <param name="tile"></param>
-        public void SetHomingTarget(Tile tile)
+        public void AddHomingTarget(Tile tile)
         {
-            SetValue(tile.X - _x, tile.Y - _y, 0);
+            _distance[tile] = 0;
         }
+
+        Dictionary<Tile, int> _distance = new Dictionary<Tile, int>();
 
         /// <summary>
         /// Generate the field
         /// </summary>
-        public void Generate()
+        public void Generate(int maxDistance, OnTileReachedHandler onTileReachedHandler=null)
         {
-            bool change = true;
-            while (change)
-            {
-                change = false;
-                for (int y = 0; y < _height; y++)
-                    for (int x = 0; x < _width; x++)
-                    {
-                        Tile tile = _world.GetTile(_x + x, _y + y);
-                        if (tile == null)
-                            continue;
-                        if (tile.Material.IsSolid)
-                            continue;
-                        int val = _map[x, y];
-                        int lowestNeighbour = Math.Min(GetValue(x + 1, y), GetValue(x - 1, y));
-                        lowestNeighbour = Math.Min(lowestNeighbour, GetValue(x, y - 1));
-                        lowestNeighbour = Math.Min(lowestNeighbour, GetValue(x, y + 1));
-                        lowestNeighbour = Math.Min(lowestNeighbour, GetValue(x - 1, y - 1));
-                        lowestNeighbour = Math.Min(lowestNeighbour, GetValue(x - 1, y + 1));
-                        lowestNeighbour = Math.Min(lowestNeighbour, GetValue(x + 1, y - 1));
-                        lowestNeighbour = Math.Min(lowestNeighbour, GetValue(x + 1, y + 1));
+            Queue<Tile> toProcess = new Queue<Tile>();
+            foreach (Tile tile in _distance.Keys)
+                toProcess.Enqueue(tile);
 
-                        if (val > lowestNeighbour + 1)
-                        {
-                            _map[x, y] = lowestNeighbour + 1;
-                            change = true;
-                        }
-                    }
+            while (toProcess.Count > 0)
+            {
+                Tile tile = toProcess.Dequeue();
+
+                int distance = _distance[tile];
+                if (distance >= maxDistance)
+                    continue;
+
+                foreach (Tile n in tile.GetNeighbours())
+                {
+                    if (_distance.ContainsKey(n))
+                        continue;
+                    if (n.Material.IsSolid && !n.Material.IsDestructable)
+                        continue;
+                    _distance[n] = distance + 1;
+                    if (onTileReachedHandler != null)
+                        onTileReachedHandler(n, distance + 1);
+                    toProcess.Enqueue(n);
+                }
             }
         }
 
-        /// <summary>
-        /// Returns the value of a cell in the field
-        /// </summary>
-        int GetValue(int x, int y)
-        {
-            if (x < 0 || y < 0)
-                return 9999;
-            if (x >= _width || y >= _height)
-                return 9999;
-            return _map[x, y];
-        }
+        public delegate void OnTileReachedHandler(Tile tile, int distance);
 
         /// <summary>
-        /// Sets the value of a cell in the field
+        /// Returns the distance of the specified tile from the nearest homing target
         /// </summary>
-        void SetValue(int x, int y, int value)
+        public int GetDistanceFromTarget(Tile tile)
         {
-            if (x < 0 || y < 0)
-                return;
-            if (x >= _width || y >= _height)
-                return;
-            _map[x, y] = value;
-        }
-
-        /// <summary>
-        /// Returns the distance of the specified tile from the nearest homing target. Returns 9999 if there is no path
-        /// from the tile to any homing target or the tile is outside the field.
-        /// </summary>
-        /// <param name="tile">tile to obtain field value for</param>
-        int GetDistanceToNearestTarget(Tile tile)
-        {
-            return GetValue(tile.X - _x, tile.Y - _y);
+            int ret;
+            if (_distance.TryGetValue(tile, out ret))
+                return ret;
+            return 9999;
         }
 
         /// <summary>
         /// Returns the neighbour of the specified tile which is closest to a homing target
         /// </summary>
-        /// <param name="tile"></param>
-        /// <returns></returns>
-        public Tile GetNext(Tile tile)
+        public Tile GetNextTileTowardsTarget(Tile tile)
         {
-            //find a neighbour that has a lower field number that the specified tile
-            int currentValue = GetDistanceToNearestTarget(tile);
-            return (from n in tile.GetNeighbours() where GetDistanceToNearestTarget(n) < currentValue select n).FirstOrDefault();
-        }
+            foreach (Tile t in tile.GetNeighbours())
+            {
+                int d = GetDistanceFromTarget(t);
+            }
 
-        /// <summary>
-        /// Centers the field on a tile on the map before generation
-        /// </summary>
-        /// <param name="tile"></param>
-        internal void CenterOn(Tile tile)
-        {
-            _x = tile.X - _width / 2;
-            _y = tile.Y - _height / 2;
+            Tile nearestTile = (from n in tile.GetNeighbours() orderby GetDistanceFromTarget(n) ascending select n).FirstOrDefault();
+            if (GetDistanceFromTarget(nearestTile) < GetDistanceFromTarget(tile))
+                return nearestTile;
+            return null;
         }
     }
 }

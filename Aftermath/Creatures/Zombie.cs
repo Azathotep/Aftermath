@@ -73,7 +73,7 @@ namespace Aftermath.Creatures
             _state = ZombieState.Idle;
         }
 
-        void BecomeEnraged()
+        public void BecomeEnraged()
         {
             _state = ZombieState.Enraged;
             _rageLevel = 50;
@@ -108,6 +108,8 @@ namespace Aftermath.Creatures
             return false;
         }
 
+        Tile _lastTile=null;
+
         /// <summary>
         /// AI logic when the zombie is enraged
         /// </summary>
@@ -119,6 +121,7 @@ namespace Aftermath.Creatures
             {
                 _rageLevel = 50;
                 _targetTile = target.Location;
+                _lastTile = null;
             }
             else
             {
@@ -126,6 +129,7 @@ namespace Aftermath.Creatures
                 _rageLevel--;
                 if (_rageLevel == 0)
                 {
+                    _targetTile = null;
                     BecomeIdle();
                     return;
                 }
@@ -139,8 +143,29 @@ namespace Aftermath.Creatures
                     _targetTile = null;
                 else
                 {
+                    //when zombies get blocked they typically step back and forth between two tiles
+                    //detect this and if it happens clear the target tile so a new target is aquired
+                    Tile location = Location;
+
                     //move towards target tile
                     MoveTowards(_targetTile);
+                    if (Location == _lastTile)
+                        _targetTile = null;
+                    _lastTile = location;
+                    return;
+                }
+            }
+
+            if (_heardSound != null && Engine.Instance.TurnSystem.TurnNumber - _heardSound.TurnEmitted > 30)
+                _heardSound = null;
+
+            //move towards heard sound
+            if (_heardSound != null)
+            {
+                Tile next = _heardSound.GetNextTileTowardsSource(Location);
+                if (next != null)
+                {
+                    MoveTowards(next);
                     return;
                 }
             }
@@ -148,6 +173,10 @@ namespace Aftermath.Creatures
             Tile scent = GetNextTileInScentTrail();
             if (scent != null)
                 MoveTo(scent);
+
+            //no target, head in a random direction
+            _targetTile = Location.GetRelativeTile(new Vector2I(Dice.Next(16)-8, Dice.Next(16)-8));
+            _lastTile = null;
         }
 
         /// <summary>
@@ -166,7 +195,20 @@ namespace Aftermath.Creatures
             }
 
             //no humans visible
-            //check sound
+
+            if (_heardSound != null && Engine.Instance.TurnSystem.TurnNumber - _heardSound.TurnEmitted > 30)
+                _heardSound = null;
+
+            //move towards last heard sound
+            if (_heardSound != null)
+            {
+                Tile next = _heardSound.GetNextTileTowardsSource(Location);
+                if (next != null)
+                {
+                    MoveTowards(next);
+                    return;
+                }
+            }
 
             //check smell
             Tile scentTarget = GetNextTileInScentTrail();
@@ -223,6 +265,12 @@ namespace Aftermath.Creatures
             }
         }
 
+        public override void Hear(Sound sound)
+        {
+            _heardSound = sound;
+            BecomeEnraged();
+        }
+
         /// <summary>
         /// Called once per zombie turn for the zombie to perform a turn action
         /// </summary>
@@ -243,14 +291,6 @@ namespace Aftermath.Creatures
                     OnEnraged();
                     break;
             }
-            //if (Engine.Instance.TurnSystem.TurnNumber != playermap_generatedTime)
-            //{
-            //    playermap = new HomingField(Engine.Instance.World, 30, 30); //50, 50);
-            //    playermap.CenterOn(Engine.Instance.Player.Location);
-            //    playermap.SetHomingTarget(Engine.Instance.Player.Location);
-            //    playermap.Generate();
-            //    playermap_generatedTime = Engine.Instance.TurnSystem.TurnNumber;
-            //}
         }
 
         /// <summary>

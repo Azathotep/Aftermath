@@ -132,7 +132,7 @@ namespace Aftermath.Core
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
-            _world.TimeOfDay = 12 * 60;
+            _world.TimeOfDay = 5 * 60;
 
             //give the player a flashlight
             //TODO refactor
@@ -140,7 +140,7 @@ namespace Aftermath.Core
             _world.Lights.Add(_player.Flashlight);
             _player.Flashlight.RecalculateLightfield();
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 30; i++)
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();
