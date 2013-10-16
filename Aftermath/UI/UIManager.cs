@@ -3,40 +3,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Aftermath.Rendering;
+using Aftermath.Input;
 
 namespace Aftermath.UI
 {
     class UIManager
     {
-        List<Menu> _menus = new List<Menu>();
-        Dictionary<string, Menu> _menuByName = new Dictionary<string, Menu>();
-
-        public void RegisterMenu(string name, Menu menu)
+        public UIManager()
         {
-            _menus.Add(menu);
-            _menuByName.Add(name, menu);
         }
 
-        public Menu GetMenuByName(string menuName)
-        {
-            return _menuByName[menuName];
-        }
+        List<Dialog> _shownDialogs = new List<Dialog>();
 
-        public void ShowMenu(string menuName)
+        public void Show(Dialog dialog)
         {
-            GetMenuByName(menuName).IsVisible = true;
-        }
-
-        public void HideMenu(string menuName)
-        {
-            GetMenuByName(menuName).IsVisible = false;
+            _shownDialogs.Add(dialog);
         }
 
         internal void RenderUI(XnaRenderer _renderer)
         {
-            foreach (Menu menu in _menus)
-                if (menu.IsVisible)
-                    menu.Render(_renderer);
+            foreach (Dialog dialog in _shownDialogs)
+                dialog.Render(_renderer);
+        }
+
+        internal bool ProcessKey(InputKey key)
+        {
+            if (_shownDialogs.Count == 0)
+                return false;
+            foreach (Dialog dialog in _shownDialogs.Reverse<Dialog>())
+            {
+                if (dialog.KeyboardFocus)
+                {
+                    dialog.ProcessKey(key);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        internal void Hide(Dialog dialog)
+        {
+            _shownDialogs.Remove(dialog);
         }
     }
 }

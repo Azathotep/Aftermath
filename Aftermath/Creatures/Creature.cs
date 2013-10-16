@@ -72,7 +72,7 @@ namespace Aftermath.Creatures
         /// <param name="target">target tile</param>
         protected ActionResult MoveTowards(Tile target)
         {
-            var candidates = (from n in Location.GetNeighbours() orderby n.GetChebyshevDistanceFrom(target) select n);
+            var candidates = (from n in Location.GetNeighbours() orderby n.GetDistanceSquared(target) select n);
             foreach (var tile in candidates)
             {
                 ActionResult result = MoveTo(tile);

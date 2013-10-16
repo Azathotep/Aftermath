@@ -9,7 +9,7 @@ namespace Aftermath.Creatures
     /// <summary>
     /// base class for all survivors
     /// </summary>
-    abstract class Human : Creature
+    public abstract class Human : Creature
     {
         HashSet<Tile> _zombieViewField = new HashSet<Tile>();
         /// <summary>

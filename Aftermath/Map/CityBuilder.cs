@@ -26,6 +26,7 @@ namespace Aftermath.Map
             Color roadLineColor = Color.FromArgb(255, 255, 0);
             Color carpetColor = Color.FromArgb(239, 228, 176);
             Color doorColor = Color.FromArgb(0, 0, 0);
+            Color glassColor = Color.FromArgb(153, 217, 234);
             //the color of pixels in the bitmap determines which tile types go where
             for (int y = 0; y < bm.Height; y++)
                 for (int x = 0; x < bm.Width; x++)
@@ -43,6 +44,8 @@ namespace Aftermath.Map
                         tile.Material = new Floor(FloorType.Carpet);
                     if (c == doorColor)
                         tile.Material = new Door();
+                    if (c == glassColor)
+                        tile.Material = new Glass();
                 }
             return city;
         }

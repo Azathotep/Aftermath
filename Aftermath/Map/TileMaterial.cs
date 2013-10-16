@@ -101,6 +101,23 @@ namespace Aftermath.Map
         }
     }
 
+    class Glass : TileMaterial
+    {
+        public override bool IsSolid
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override string GetTexture(Tile tile, out float rotation)
+        {
+            rotation = 0;
+            return "overlay.gauze";
+        }
+    }
+
     class Road : TileMaterial
     {
         RoadType _type;

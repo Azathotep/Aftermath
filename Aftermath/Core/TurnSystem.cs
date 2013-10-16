@@ -160,6 +160,11 @@ namespace Aftermath.Core
         {
             _turnInhibitors.Add(inhibitor);
         }
+
+        internal void Clear()
+        {
+            _turns.Clear();
+        }
     }
 
     public interface ITurnInihibitor

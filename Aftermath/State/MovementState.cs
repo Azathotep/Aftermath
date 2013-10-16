@@ -5,6 +5,7 @@ using System.Text;
 using Aftermath.Input;
 using Aftermath.Utils;
 using Aftermath.Lighting;
+using Aftermath.UI;
 using Microsoft.Xna.Framework;
 
 namespace Aftermath.State
@@ -51,7 +52,10 @@ namespace Aftermath.State
                     GameState.CurrentState = GameState.InteractState;
                     break;
                 case InputKey.Escape:
-                    GameState.CurrentState = GameState.GamePausedState;
+                    PauseMenu menu = new PauseMenu();
+                    menu.Show();
+
+                    //GameState.CurrentState = GameState.GamePausedState;
                     //Engine.Exit();
                     break;
                 case InputKey.F:

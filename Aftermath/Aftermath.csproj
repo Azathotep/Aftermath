@@ -77,8 +77,10 @@
     <Compile Include="Rendering\SpriteSheet.cs" />
     <Compile Include="Rendering\TextureManager.cs" />
     <Compile Include="Rendering\XnaRenderer.cs" />
+    <Compile Include="Scenarios\Tutorial1.cs" />
+    <Compile Include="UI\Dialog.cs" />
+    <Compile Include="UI\MessageDialog.cs" />
     <Compile Include="UI\PauseMenu.cs" />
-    <Compile Include="UI\Menu.cs" />
     <Compile Include="UI\UIManager.cs" />
     <Compile Include="Utils\Compass.cs" />
     <Compile Include="Utils\Dice.cs" />
@@ -111,6 +113,9 @@
     <Content Include="Content\house.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Content\Maps\tutorial.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="Content\overlay.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

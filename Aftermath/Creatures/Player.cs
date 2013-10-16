@@ -8,7 +8,7 @@ using Aftermath.Lighting;
 
 namespace Aftermath.Creatures
 {
-    class Player : Human
+    public class Player : Human
     {
         public Player()
         {
@@ -37,10 +37,16 @@ namespace Aftermath.Creatures
         {
             //get the torch to follow the player
             //refactor this
-            Flashlight.Location = Location;
-            Flashlight.RecalculateLightfield();
+            if (Flashlight != null)
+            {
+                Flashlight.Location = Location;
+                Flashlight.RecalculateLightfield();
+            }
 
             Location.DropScent(500);
+
+            if (Dice.Next(50) == 0)
+                Map.Sound.Emit(Location, 100);
 
             base.PostTurn();
         }

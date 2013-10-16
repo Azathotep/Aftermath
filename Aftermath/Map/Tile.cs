@@ -125,12 +125,13 @@ namespace Aftermath.Map
         }
 
         /// <summary>
-        /// Places a creature on this tile. The creature should not be part of the map already.
+        /// Places a creature on this tile. The creature should not be part of the map or turn system already.
         /// </summary>
         public void PlaceCreature(Creature creature)
         {
             if (creature.Location != null)
                 throw new Exception("Creature cannot be placed as it is already placed on a map");
+            Engine.Instance.TurnSystem.RegisterCreature(creature);
             creature.Place(this);
         }
 

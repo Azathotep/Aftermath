@@ -10,20 +10,20 @@ namespace Aftermath.State
 {
     class GamePausedState : GameState
     {
-        protected override void OnSwitchTo()
-        {
-            Engine.Instance.UIManager.ShowMenu("PauseMenu");
-        }
+        //protected override void OnSwitchTo()
+        //{
+        //    PauseMenu
+        //    Engine.Instance.UIManager.ShowDialog("PauseMenu");
+        //}
 
-        protected override void OnSwitchAway()
-        {
-            Engine.Instance.UIManager.HideMenu("PauseMenu");
-        }
+        //protected override void OnSwitchAway()
+        //{
+        //    Engine.Instance.UIManager.HideDialog("PauseMenu");
+        //}
 
         public override void ProcessKey(InputKey key)
         {
-            Menu menu = Engine.Instance.UIManager.GetMenuByName("PauseMenu");
-            menu.ProcessKey(key);
+            throw new NotImplementedException();
         }
     }
 }

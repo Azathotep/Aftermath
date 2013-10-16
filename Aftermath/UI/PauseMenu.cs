@@ -10,7 +10,7 @@ using Aftermath.Utils;
 
 namespace Aftermath.UI
 {
-    class PauseMenu : Menu
+    class PauseMenu : Dialog
     {
         float _selectionRotate;
         int _selectedItem;
@@ -41,7 +41,7 @@ namespace Aftermath.UI
                     switch (_selectedItem)
                     {
                         case 0:
-                            GameState.CurrentState = GameState.MovementState;
+                            Close();
                             break;
                         case 1:
                             Engine.Instance.Exit();

@@ -13,6 +13,7 @@ using Aftermath.Animations;
 using Aftermath.State;
 using Aftermath.UI;
 using Aftermath.Lighting;
+using Aftermath.Scenarios;
 
 namespace Aftermath.Core
 {
@@ -47,7 +48,6 @@ namespace Aftermath.Core
             _camera = new Camera();
             _turnSystem = new TurnSystem();
             _turnSystem.OnTurnAdvanced += _turnSystem_OnTurnAdvanced;
-            _uiManager.RegisterMenu("PauseMenu", new PauseMenu());
         }
 
         void _turnSystem_OnTurnAdvanced()
@@ -120,27 +120,25 @@ namespace Aftermath.Core
         public void Initialize()
         {
             _fov = new FovRecursiveShadowcast();
+            _turnSystem.RegisterTurnInhibitor(_animationManager);
+            
 
-            _world = new World(10, 10);
             CityBuilder builder = new CityBuilder();
             _world = builder.FromBitmap(@"Content\city.bmp");
 
-            _camera.Position = new Vector2F(5.5f, 5.5f);
             _player = new Player();
             _player.WeildGun(new Creature.Gun());
-            _turnSystem.RegisterCreature(_player);
-            _turnSystem.RegisterTurnInhibitor(_animationManager);
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
-            _world.TimeOfDay = 5 * 60;
+            _world.TimeOfDay = 8 * 60;
 
             //give the player a flashlight
             //TODO refactor
-            _player.Flashlight = new PointLight(_player.Location, 4, new Color(0.8f,0.8f,0.2f));
+            _player.Flashlight = new PointLight(_player.Location, 4, new Color(0.8f, 0.8f, 0.2f));
             _world.Lights.Add(_player.Flashlight);
             _player.Flashlight.RecalculateLightfield();
 
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 50; i++)
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();
@@ -149,9 +147,10 @@ namespace Aftermath.Core
                     i--;
                     continue;
                 }
-                _turnSystem.RegisterCreature(zombie);
                 tile.PlaceCreature(zombie);
             }
+
+            //LoadScenario(new Tutorial1());
 
             
             _keyboardHandler.RegisterKey(InputKey.W, retriggerInterval:0);
@@ -173,9 +172,17 @@ namespace Aftermath.Core
             _keyboardHandler.RegisterKey(InputKey.Enter, retriggerInterval: 20);
         }
 
+        void LoadScenario(Scenario scenario)
+        {
+            Engine.Instance.TurnSystem.Clear();
+            scenario.Initialize(out _world, out _player);
+        }
+
 
         void KeyHandler(InputKey key)
         {
+            if (UIManager.ProcessKey(key))
+                return;
             GameState.CurrentState.ProcessKey(key);
         }
 
@@ -405,6 +412,10 @@ namespace Aftermath.Core
             {
                 return _player;
             }
+            set
+            {
+                _player = value;
+            }
         }
 
         public World World 
@@ -412,6 +423,10 @@ namespace Aftermath.Core
             get
             {
                 return _world;
+            }
+            set
+            {
+                _world = value;
             }
         }
     }
