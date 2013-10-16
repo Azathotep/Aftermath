@@ -69,6 +69,9 @@ namespace Aftermath.State
                 case InputKey.R:
                     Engine.Player.Reload();
                     break;
+                case InputKey.OemComma:
+                    Engine.Player.PickupItem();
+                    break;
             }
         }
     }

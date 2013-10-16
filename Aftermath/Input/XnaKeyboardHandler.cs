@@ -37,7 +37,6 @@ namespace Aftermath.Input
             {
                 throw new Exception();
             }
-            
             _registeredKeys.Add(new KeyState(key, xnaKey, callback, shiftDown, retriggerInterval));
         }
     }

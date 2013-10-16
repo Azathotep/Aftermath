@@ -136,6 +136,7 @@ namespace Aftermath.Core
 
             _world.TimeOfDay = 5 * 60;
 
+            //give the player a flashlight
             _player.Flashlight = new Flashlight(_world);
 
             _player.Location.GetNeighbour(CompassDirection.North).PlaceItem(new Pistol9mm());
@@ -146,13 +147,6 @@ namespace Aftermath.Core
                 if (!success)
                     i--;
             }
-
-            //_player.Location.GetNeighbour(CompassDirection.South).GetNeighbour(CompassDirection.South).PlaceItem(new Pistol9mm());
-
-            
-            //give the player a flashlight
-            //TODO refactor
-            
 
             for (int i = 0; i < 10; i++)
             {
@@ -178,6 +172,8 @@ namespace Aftermath.Core
             _keyboardHandler.RegisterKey(InputKey.R, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.I, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.L, retriggerInterval: 20);
+
+            _keyboardHandler.RegisterKey(InputKey.OemComma, retriggerInterval: 20);
 
             _keyboardHandler.RegisterKey(InputKey.Left, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Right, retriggerInterval: 20);

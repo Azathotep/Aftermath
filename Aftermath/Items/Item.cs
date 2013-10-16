@@ -29,5 +29,11 @@ namespace Aftermath.Items
         {
             get;
         }
+
+        internal void RemoveFromTile()
+        {
+            _location.Item = null;
+            _location = null;
+        }
     }
 }

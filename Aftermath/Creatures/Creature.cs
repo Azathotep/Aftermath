@@ -7,6 +7,7 @@ using Aftermath.Map;
 using Aftermath.Animations;
 using Aftermath.Utils;
 using Aftermath.Weapons;
+using Aftermath.Items;
 
 namespace Aftermath.Creatures
 {
@@ -242,6 +243,47 @@ namespace Aftermath.Creatures
         public abstract Rendering.GameTexture Texture 
         { 
             get;
+        }
+
+        List<Item> _inventory = null;
+
+        /// <summary>
+        /// Returns the inventory of this creature. Items should not be added directly to this collection.
+        /// </summary>
+        public List<Item> Inventory
+        {
+            get
+            {
+                //inventory is only created when the first item is added
+                if (_inventory == null)
+                    return new List<Item>();
+                return _inventory;
+            }
+        }
+
+        /// <summary>
+        /// Pick up item from the floor
+        /// </summary>
+        internal void PickupItem()
+        {
+            Item item = Location.Item;
+            if (item == null)
+                return;
+            item.RemoveFromTile();
+            AddItemToInventory(item);
+            EndTurn();
+        }
+
+        /// <summary>
+        /// Adds an item to the creature's inventory
+        /// </summary>
+        /// <param name="item"></param>
+        public void AddItemToInventory(Item item)
+        {
+            //inventory is created lazy as most creatures won't have one
+            if (_inventory == null)
+                _inventory = new List<Item>();
+            _inventory.Add(item);
         }
 
         protected int _health = 20;
