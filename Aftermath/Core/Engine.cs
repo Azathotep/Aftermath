@@ -138,11 +138,23 @@ namespace Aftermath.Core
 
             _player.Flashlight = new Flashlight(_world);
 
+            _player.Location.GetNeighbour(CompassDirection.North).PlaceItem(new Pistol9mm());
+
+            for (int i = 0; i < 100; i++)
+            {
+                bool success = _world.GetRandomEmptyTile().PlaceItem(new Pistol9mm());
+                if (!success)
+                    i--;
+            }
+
+            //_player.Location.GetNeighbour(CompassDirection.South).GetNeighbour(CompassDirection.South).PlaceItem(new Pistol9mm());
+
+            
             //give the player a flashlight
             //TODO refactor
             
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 10; i++)
             {
                 Zombie zombie = new Zombie();
                 Tile tile = _world.GetRandomEmptyTile();
@@ -188,6 +200,8 @@ namespace Aftermath.Core
         {
             if (UIManager.ProcessKey(key))
                 return;
+            if (TurnSystem.CurrentActor != Engine.Instance.Player)
+                return;
             GameState.CurrentState.ProcessKey(key);
         }
 
@@ -198,6 +212,8 @@ namespace Aftermath.Core
         int _playerLastVisibleFilesFetchTime;
 
         float _zoomAmt = 0;
+
+        float _itemBounceOffset = 0;
 
         public void DrawFrame(GameTime gameTime)
         {
@@ -234,6 +250,8 @@ namespace Aftermath.Core
                 if (_zoomAmt < 1.5f)
                     _zoomAmt += 0.1f;
             }
+
+            _itemBounceOffset += 0.15f;
 
             Vector2 lookAt = new Vector2(_camera.Position.X, _camera.Position.Y);
             Matrix view = Matrix.CreateLookAt(new Vector3(lookAt, -1), new Vector3(lookAt, 0), new Vector3(0, -1, 0));
@@ -277,6 +295,13 @@ namespace Aftermath.Core
                         if (tile.Corpse != null)
                         {
                             _renderer.Draw(tile.Corpse.Texture, new RectangleF(x, y, 1, 1), 0.6f, 0, new Vector2F(0.5f, 0.5f), Color.AliceBlue);
+                        }
+
+                        if (tile.Item != null)
+                        {
+                            double offset = Math.Sin(_itemBounceOffset) * 0.1f;
+                            GameTexture texture = tile.Item.Texture;
+                            _renderer.Draw(texture, new RectangleF(x, y - (float)offset-0.05f, 1, 1), 0.5f, 0, new Vector2F(0.5f, 0.5f));
                         }
 
                         if (tile.Creature != null)
@@ -398,6 +423,7 @@ namespace Aftermath.Core
             _textureManager.RegisterSpriteSheetTextures("road");
             _textureManager.RegisterSpriteSheetTextures("house");
             _textureManager.RegisterSpriteSheetTextures("overlay");
+            _textureManager.RegisterSpriteSheetTextures("items");
         }
 
         internal HashSet<Tile> GetFov(Tile eyePosition, int sightRadius)

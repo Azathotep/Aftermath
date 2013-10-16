@@ -42,8 +42,8 @@ namespace Aftermath.Creatures
 
             Location.DropScent(500);
 
-            if (Dice.Next(50) == 0)
-                Map.Sound.Emit(Location, 100);
+            //if (Dice.Next(50) == 0)
+            //    Map.Sound.Emit(Location, 100);
 
             base.PostTurn();
         }

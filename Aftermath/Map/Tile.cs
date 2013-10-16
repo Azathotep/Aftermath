@@ -7,6 +7,7 @@ using Aftermath.Creatures;
 using Aftermath.AI.Navigation;
 using Aftermath.Utils;
 using Aftermath.Lighting;
+using Aftermath.Items;
 using Microsoft.Xna.Framework;
 
 namespace Aftermath.Map
@@ -55,6 +56,19 @@ namespace Aftermath.Map
             set
             {
                 _creature = value;
+            }
+        }
+
+        Item _item;
+        public Item Item
+        {
+            get
+            {
+                return _item;
+            }
+            set
+            {
+                _item = value;
             }
         }
 
@@ -127,12 +141,26 @@ namespace Aftermath.Map
         /// <summary>
         /// Places a creature on this tile. The creature should not be part of the map or turn system already.
         /// </summary>
-        public void PlaceCreature(Creature creature)
+        public bool PlaceCreature(Creature creature)
         {
+            if (Creature != null)
+                return false;
             if (creature.Location != null)
                 throw new Exception("Creature cannot be placed as it is already placed on a map");
             Engine.Instance.TurnSystem.RegisterCreature(creature);
             creature.Place(this);
+            return true;
+        }
+
+        /// <summary>
+        /// Places an item on this tile
+        /// </summary>
+        public bool PlaceItem(Item item)
+        {
+            if (Item != null)
+                return false;
+            item.Place(this);
+            return true;
         }
 
         internal int GetManhattenDistanceFrom(Tile other)

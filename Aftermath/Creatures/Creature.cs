@@ -237,7 +237,6 @@ namespace Aftermath.Creatures
         public void Place(Tile targetTile)
         {
             InternalMove(targetTile);
-            //targetTile.Map.RegisterCreature(this);
         }
 
         public abstract Rendering.GameTexture Texture 

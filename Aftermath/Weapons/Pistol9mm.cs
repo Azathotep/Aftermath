@@ -6,6 +6,7 @@ using Aftermath.Core;
 using Aftermath.Creatures;
 using Aftermath.Map;
 using Aftermath.Animations;
+using Aftermath.Rendering;
 
 namespace Aftermath.Weapons
 {
@@ -21,6 +22,14 @@ namespace Aftermath.Weapons
             if (targetTile.Creature != null)
                 targetTile.Creature.PutDamage(10);
             return true;
+        }
+
+        public override GameTexture Texture
+        {
+            get
+            {
+                return Engine.Instance.TextureManager.GetTexture("items.9mm");
+            }
         }
     }
 }
