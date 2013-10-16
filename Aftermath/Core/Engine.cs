@@ -14,6 +14,7 @@ using Aftermath.State;
 using Aftermath.UI;
 using Aftermath.Lighting;
 using Aftermath.Scenarios;
+using Aftermath.Weapons;
 
 namespace Aftermath.Core
 {
@@ -127,7 +128,7 @@ namespace Aftermath.Core
             _world = builder.FromBitmap(@"Content\city.bmp");
 
             _player = new Player();
-            _player.WeildGun(new Creature.Gun());
+            _player.WeildGun(new Pistol9mm());
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
             _world.TimeOfDay = 8 * 60;

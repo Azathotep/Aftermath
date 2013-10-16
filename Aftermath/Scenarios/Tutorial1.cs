@@ -8,6 +8,7 @@ using Aftermath.Creatures;
 using Aftermath.UI;
 using Aftermath.State;
 using Aftermath.Utils;
+using Aftermath.Weapons;
 
 namespace Aftermath.Scenarios
 {
@@ -21,7 +22,7 @@ namespace Aftermath.Scenarios
             CityBuilder builder = new CityBuilder();
             world = builder.FromBitmap(@"Content\Maps\tutorial.bmp");
             player = new Player();
-            player.WeildGun(new Creature.Gun());
+            player.WeildGun(new Pistol9mm());
             world.GetTile(9,14).PlaceCreature(player);
             world.TimeOfDay = 12 * 60;
             _zombie = new Zombie();

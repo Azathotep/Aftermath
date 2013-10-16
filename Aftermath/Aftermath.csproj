@@ -88,6 +88,8 @@
     <Compile Include="Utils\RectangleI.cs" />
     <Compile Include="Utils\Vector2F.cs" />
     <Compile Include="Utils\Vector2I.cs" />
+    <Compile Include="Weapons\Gun.cs" />
+    <Compile Include="Weapons\Pistol9mm.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">

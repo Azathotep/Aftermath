@@ -6,6 +6,7 @@ using Aftermath.Core;
 using Aftermath.Map;
 using Aftermath.Animations;
 using Aftermath.Utils;
+using Aftermath.Weapons;
 
 namespace Aftermath.Creatures
 {
@@ -298,37 +299,6 @@ namespace Aftermath.Creatures
             return null;
         }
 
-        public class Gun
-        {
-            /// <summary>
-            /// The current owner of the gun. This method allows the position of the gun to be obtained.
-            /// </summary>
-            public Creature Owner
-            {
-                get;
-                set;
-            }
-
-            public int LoadedAmmo = 6;
-
-            internal bool Fire(Creature firer, Tile targetTile)
-            {
-                if (LoadedAmmo < 0)
-                    return false;
-                LoadedAmmo--;
-                Engine.Instance.AnimationManager.StartAnimation(new MuzzleFlashAnimation(firer));
-                Sound.Emit(Core.Engine.Instance.Player.Location, 20);
-                if (targetTile.Creature != null)
-                    targetTile.Creature.PutDamage(10);
-                return true;
-            }
-
-            internal void Reload()
-            {
-                LoadedAmmo = 6;
-            }
-        }
-
         Gun _selectedGun;
         internal Gun SelectedGun
         {
@@ -341,7 +311,6 @@ namespace Aftermath.Creatures
         public void WeildGun(Gun gun)
         {
             _selectedGun = gun;
-            _selectedGun.Owner = this;
         }
 
         internal void FireAt(Tile targetTile)
