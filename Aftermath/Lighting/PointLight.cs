@@ -20,6 +20,19 @@ namespace Aftermath.Lighting
             Color = color;
         }
 
+        bool _on;
+        public bool On
+        {
+            get
+            {
+                return _on;
+            }
+            set
+            {
+                _on = value;
+            }
+        }
+
         HashSet<Tile> _lightField = new HashSet<Tile>();
         /// <summary>
         /// Returns the tiles that are currently visible to the light (tiles that the light is shining on)
@@ -62,6 +75,8 @@ namespace Aftermath.Lighting
         /// </summary>
         internal float GetBrightnessAt(Tile tile)
         {
+            if (!On)
+                return 0;
             if (!LightField.Contains(tile))
                 return 0;
             //return 0.4f;

@@ -15,6 +15,7 @@ using Aftermath.UI;
 using Aftermath.Lighting;
 using Aftermath.Scenarios;
 using Aftermath.Weapons;
+using Aftermath.Items;
 
 namespace Aftermath.Core
 {
@@ -128,16 +129,18 @@ namespace Aftermath.Core
             _world = builder.FromBitmap(@"Content\city.bmp");
 
             _player = new Player();
+            
+
             _player.WeildGun(new Pistol9mm());
             _world.GetRandomEmptyTile().PlaceCreature(_player);
 
-            _world.TimeOfDay = 8 * 60;
+            _world.TimeOfDay = 5 * 60;
+
+            _player.Flashlight = new Flashlight(_world);
 
             //give the player a flashlight
             //TODO refactor
-            _player.Flashlight = new PointLight(_player.Location, 4, new Color(0.8f, 0.8f, 0.2f));
-            _world.Lights.Add(_player.Flashlight);
-            _player.Flashlight.RecalculateLightfield();
+            
 
             for (int i = 0; i < 50; i++)
             {
@@ -162,6 +165,7 @@ namespace Aftermath.Core
             _keyboardHandler.RegisterKey(InputKey.F, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.R, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.I, retriggerInterval: 20);
+            _keyboardHandler.RegisterKey(InputKey.L, retriggerInterval: 20);
 
             _keyboardHandler.RegisterKey(InputKey.Left, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Right, retriggerInterval: 20);

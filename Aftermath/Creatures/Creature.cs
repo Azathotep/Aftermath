@@ -188,7 +188,16 @@ namespace Aftermath.Creatures
         /// <returns>set of visible tiles</returns>
         public HashSet<Tile> GetVisibleTiles(float lightThreshold = 0)
         {
-            return _tile.GetVisibleTiles(_sightRadius, lightThreshold);
+            HashSet<Tile> ret = _tile.GetVisibleTiles(_sightRadius, lightThreshold);
+            //add neighbour tiles whether they are visible or not. Creatures can always see these tiles
+            foreach (CompassDirection direction in Compass.CompassDirections)
+            {
+                Tile neighbour = Location.GetNeighbour(direction);
+                if (neighbour != null)
+                    ret.Add(neighbour);
+            }
+            ret.Add(Location);
+            return ret;
         }
 
         /// <summary>

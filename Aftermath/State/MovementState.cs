@@ -63,6 +63,9 @@ namespace Aftermath.State
                     GameState.CurrentState = GameState.AimingState;
                     Engine._targetingModule.ReaquireTarget(Engine.Player);
                     break;
+                case InputKey.L:
+                    Engine.Player.ToggleFlashlight();
+                    break;
                 case InputKey.R:
                     Engine.Player.Reload();
                     break;

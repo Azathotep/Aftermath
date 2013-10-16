@@ -55,6 +55,7 @@
     <Compile Include="Creatures\Player.cs" />
     <Compile Include="Creatures\Zombie.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="Items\Flashlight.cs" />
     <Compile Include="Lighting\Light.cs" />
     <Compile Include="Lighting\PointLight.cs" />
     <Compile Include="Map\Sound.cs" />

@@ -5,6 +5,7 @@ using System.Text;
 using Aftermath.Rendering;
 using Aftermath.Utils;
 using Aftermath.Lighting;
+using Aftermath.Items;
 
 namespace Aftermath.Creatures
 {
@@ -35,13 +36,9 @@ namespace Aftermath.Creatures
 
         public override void PostTurn()
         {
-            //get the torch to follow the player
-            //refactor this
+            //update the flashlight to the player's new position
             if (Flashlight != null)
-            {
-                Flashlight.Location = Location;
-                Flashlight.RecalculateLightfield();
-            }
+                Flashlight.SetPosition(Location);
 
             Location.DropScent(500);
 
@@ -51,6 +48,24 @@ namespace Aftermath.Creatures
             base.PostTurn();
         }
 
-        public PointLight Flashlight;
+        Flashlight _flashlight;
+        public Flashlight Flashlight
+        {
+            get
+            {
+                return _flashlight;
+            }
+            set
+            {
+                _flashlight = value;
+                _flashlight.SetPosition(Location);  
+            }
+        }
+
+        internal void ToggleFlashlight()
+        {
+            Flashlight.On = !Flashlight.On;
+            EndTurn();
+        }
     }
 }
