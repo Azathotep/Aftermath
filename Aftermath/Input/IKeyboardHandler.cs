@@ -18,6 +18,7 @@ namespace Aftermath.Input
         Left, Right, Up, Down,
         OemPeriod,
         Enter,
-        OemComma
+        OemComma,
+        Space
     }
 }

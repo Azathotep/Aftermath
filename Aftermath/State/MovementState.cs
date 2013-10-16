@@ -72,6 +72,10 @@ namespace Aftermath.State
                 case InputKey.OemComma:
                     Engine.Player.PickupItem();
                     break;
+                case InputKey.Space:
+                    InventoryDialog inventoryDialog = new InventoryDialog(Engine.Player.Inventory);
+                    inventoryDialog.Show();
+                    break;
             }
         }
     }

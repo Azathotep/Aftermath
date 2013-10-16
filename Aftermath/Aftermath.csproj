@@ -80,6 +80,7 @@
     <Compile Include="Rendering\TextureManager.cs" />
     <Compile Include="Rendering\XnaRenderer.cs" />
     <Compile Include="Scenarios\Tutorial1.cs" />
+    <Compile Include="UI\InventoryDialog.cs" />
     <Compile Include="UI\Dialog.cs" />
     <Compile Include="UI\MessageDialog.cs" />
     <Compile Include="UI\PauseMenu.cs" />

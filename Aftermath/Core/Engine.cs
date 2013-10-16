@@ -183,6 +183,7 @@ namespace Aftermath.Core
 
             _keyboardHandler.RegisterKey(InputKey.Escape, retriggerInterval: 20);
             _keyboardHandler.RegisterKey(InputKey.Enter, retriggerInterval: 20);
+            _keyboardHandler.RegisterKey(InputKey.Space, retriggerInterval: 20);
         }
 
         void LoadScenario(Scenario scenario)
@@ -455,6 +456,11 @@ namespace Aftermath.Core
             {
                 _world = value;
             }
+        }
+
+        internal static GameTexture GetTexture(string textureName)
+        {
+            return Instance.TextureManager.GetTexture(textureName);
         }
     }
 }
