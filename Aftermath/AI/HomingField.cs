@@ -46,7 +46,7 @@ namespace Aftermath.AI
                 {
                     if (_distance.ContainsKey(n))
                         continue;
-                    if (n.Material.IsSolid && !n.Material.IsDestructable)
+                    if (n.IsSolid && !n.ContainsDestructableObstacle)
                         continue;
                     _distance[n] = distance + 1;
                     if (onTileReachedHandler != null)

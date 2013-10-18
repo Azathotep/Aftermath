@@ -101,9 +101,9 @@ namespace Aftermath.Creatures
         /// <returns>true if this event is handled</returns>
         protected override bool OnBump(Tile tile)
         {
-            if (tile.Material.IsDestructable)
+            if (tile.Structure != null)
             {
-                tile.Material.Damage(tile, 2);
+                tile.Structure.Damage(2);
             }
             return false;
         }

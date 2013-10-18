@@ -27,7 +27,7 @@ namespace Aftermath.Map
         /// <summary>
         /// Returns true if the tile blocks visible light, eg obstructs vision
         /// </summary>
-        public virtual bool IsOpaque 
+        public virtual bool BlocksLight 
         {
             get
             {
@@ -45,27 +45,6 @@ namespace Aftermath.Map
                 return false;
             }
         }
-
-        /// <summary>
-        /// Returns whether this material can be destroyed
-        /// </summary>
-        public virtual bool IsDestructable 
-        {
-            get
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Applies damage to the material. Destructable materials should override this.
-        /// </summary>
-        /// <param name="tile">tile material is part of</param>
-        /// <param name="damageAmount">amount to damage the tile</param>
-        public virtual void Damage(Tile tile, int damageAmount)
-        {
-            
-        }
     }
 
     class Wall : TileMaterial
@@ -77,8 +56,13 @@ namespace Aftermath.Map
             //to draw is differnet (thin wall) because the player remembers what is on the otherside of the wall
             bool thinWall = false;
             Tile south = tile.GetNeighbour(CompassDirection.South);
-            if (south != null && !south.Material.IsOpaque && south.Material.GetType() != typeof(Door) && Engine.Instance.PlayerSeenTiles.Contains(south))
-                thinWall = true;
+            if (south != null)
+            {
+                Door door = south.Structure as Door;
+                //if southern tile does not block light, has been seen and isn't a door
+                if (!south.BlocksLight && Engine.Instance.PlayerSeenTiles.Contains(south) && door == null)
+                    thinWall = true;
+            }
             if (thinWall)
                 return "house.northwall";
             return "house.solidwall";
@@ -92,7 +76,7 @@ namespace Aftermath.Map
             }
         }
 
-        public override bool IsOpaque
+        public override bool BlocksLight
         {
             get
             {
@@ -207,82 +191,6 @@ namespace Aftermath.Map
                 case FloorType.Pavement:
                 default:
                     return "steel.floor";
-            }
-        }
-    }
-
-    class Door : TileMaterial
-    {
-        bool _isOpen = true;
-
-        public override bool IsOpaque
-        {
-            get
-            {
-                return !_isOpen;
-            }
-        }
-
-        public override bool IsSolid
-        {
-            get
-            {
-                return !_isOpen;
-            }
-        }
-
-        public override string GetTexture(Tile tile, out float rotation)
-        {
-            rotation = 0;
-            if (_isOpen)
-                return "house.opendoor";
-            else
-                return "house.shutdoor";
-        }
-
-        public bool IsOpen 
-        {
-            get
-            {
-                if (_health <= 0)
-                    return true;
-                return _isOpen;
-            }
-        }
-
-        public void Open()
-        {
-            if (_health <= 0)
-                return;
-            _isOpen = true;
-        }
-
-        public void Close()
-        {
-            if (_health <= 0)
-                return;
-            _isOpen = false;
-        }
-
-        int _health = 10;
-        public override void Damage(Tile tile, int damageAmount)
-        {
-            if (_health <= 0)
-                return;
-            _health -= damageAmount;
-            Engine.Instance.AnimationManager.StartAnimation(new BashAnimation(tile));
-            if (_health <= 0)
-            {
-                _isOpen = true;
-                _health = 0;
-            }
-        }
-
-        public override bool IsDestructable
-        {
-            get
-            {
-                return true;
             }
         }
     }

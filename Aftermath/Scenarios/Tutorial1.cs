@@ -76,7 +76,7 @@ namespace Aftermath.Scenarios
                     }
                     break;
                 case Stage.DoorOpen:
-                    Door door = _player.Location.GetNeighbour(CompassDirection.North).Material as Door;
+                    Door door = _player.Location.GetNeighbour(CompassDirection.North).Structure as Door;
                     if (door != null && door.IsOpen)
                     {
                         _lastPoint = _player.Location;

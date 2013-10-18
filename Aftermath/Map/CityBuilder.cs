@@ -32,7 +32,7 @@ namespace Aftermath.Map
             Color carpetColor = Color.FromArgb(239, 228, 176);
             Color doorColor = Color.FromArgb(0, 0, 0);
             Color glassColor = Color.FromArgb(153, 217, 234);
-            Color lightColor = Color.FromArgb(255, 255, 0);
+            //Color lightColor = Color.FromArgb(255, 255, 0);
             Color playerColor = Color.FromArgb(0, 255, 0);
             Color closedDoorColor = Color.FromArgb(255, 0, 0);
             Color zombieColor = Color.FromArgb(0, 100, 0);
@@ -56,17 +56,17 @@ namespace Aftermath.Map
                         Door door = new Door();
                         if (c == closedDoorColor)
                             door.Close();
-                        tile.Material = door;
+                        tile.PlaceStructure(door);
                     }
                     if (c == glassColor)
                         tile.Material = new Glass();
-                    if (c == lightColor)
-                    {
-                        tile.Material = new Floor(FloorType.Carpet);
-                        PointLight light = new PointLight(tile, 8, new Microsoft.Xna.Framework.Color(0.5f, 0.5f, 0.3f, 0.5f));
-                        light.On = true;
-                        city.Lights.Add(light);
-                    }
+                    //if (c == lightColor)
+                    //{
+                    //    tile.Material = new Floor(FloorType.Carpet);
+                    //    PointLight light = new PointLight(tile, 8, new Microsoft.Xna.Framework.Color(0.5f, 0.5f, 0.3f, 0.5f));
+                    //    light.On = true;
+                    //    city.Lights.Add(light);
+                    //}
                     if (c == playerColor)
                     {
                         tile.Material = new Floor(FloorType.Carpet);

@@ -59,7 +59,9 @@
     <Compile Include="Items\Item.cs" />
     <Compile Include="Lighting\Light.cs" />
     <Compile Include="Lighting\PointLight.cs" />
+    <Compile Include="Map\Door.cs" />
     <Compile Include="Map\Sound.cs" />
+    <Compile Include="Map\Structure.cs" />
     <Compile Include="Map\TileMaterial.cs" />
     <Compile Include="State\AimingState.cs" />
     <Compile Include="State\InteractState.cs" />

@@ -278,6 +278,12 @@ namespace Aftermath.Core
                         color = new Color(0.1f,0.1f,0.1f);
 
                     _renderer.Draw(_textureManager.GetTexture(textureName), new RectangleF(x, y, 1, 1), 1, rotation, new Vector2F(0.5f, 0.5f), color);
+                    if (tile.Structure != null)
+                    {
+                        _renderer.Draw(tile.Structure.Texture, new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), color);
+                    }
+                    
+                    
                     if (isVisible)
                     {
                         //draw corpse first

@@ -97,7 +97,7 @@ namespace Aftermath.Creatures
             //face the attempted direction of movement
             Face(targetTile);
 
-            if (targetTile.Material.IsSolid)
+            if (targetTile.IsSolid)
             {
                 bool handled = OnBump(targetTile);
                 if (handled)
@@ -327,8 +327,8 @@ namespace Aftermath.Creatures
             var candidates = (from l in Location.GetNeighbours() select new { Distance = l.GetChebyshevDistanceFrom(tile), Tile = l }).OrderBy((a) => a.Distance);
             foreach (var candidate in candidates)
             {
-                Door door = candidate.Tile.Material as Door;
-                if (door == null && candidate.Tile.Material.IsOpaque)
+                Door door = candidate.Tile.Structure as Door;
+                if (door == null && candidate.Tile.BlocksLight)
                     continue;
 
                 if (candidate.Tile.Creature != null)
@@ -366,7 +366,7 @@ namespace Aftermath.Creatures
         {
             foreach (Tile tile in Location.GetNeighbours())
             {
-                Door door = tile.Material as Door;
+                Door door = tile.Structure as Door;
                 if (door != null)
                 {
                     if (door.IsOpen)

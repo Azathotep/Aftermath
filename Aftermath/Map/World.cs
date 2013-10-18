@@ -27,6 +27,22 @@ namespace Aftermath.Map
             _fov = new FovRecursiveShadowcast(this);
         }
 
+        public int Width
+        {
+            get
+            {
+                return _width;
+            }
+        }
+
+        public int Height
+        {
+            get
+            {
+                return _height;
+            }
+        }
+
         public FovRecursiveShadowcast Fov
         {
             get
@@ -56,7 +72,7 @@ namespace Aftermath.Map
             for (int i = 0; i < 1000; i++)
             {
                 Tile tile = GetTile(r.Next(_width), r.Next(_height));
-                if (tile.Material.IsSolid || tile.Creature != null)
+                if (tile.IsSolid || tile.Creature != null)
                     continue;
                 return tile;
             }
@@ -68,7 +84,7 @@ namespace Aftermath.Map
             Tile tile = GetTile(x, y);
             if (tile == null)
                 return true;
-            return tile.Material.IsOpaque;
+            return tile.BlocksLight;
         }
 
         int _timeOfDay;

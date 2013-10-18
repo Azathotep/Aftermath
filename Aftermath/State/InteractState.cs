@@ -24,7 +24,7 @@ namespace Aftermath.State
                 Tile target = Engine.Player.Location.GetNeighbour(direction.Value);
                 //depending what is on the target perform some action
                 //if the target is a door then the interaction is to open or close it
-                Door door = target.Material as Door;
+                Door door = target.Structure as Door;
                 if (door != null)
                 {
                     if (door.IsOpen)

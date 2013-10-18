@@ -44,6 +44,19 @@ namespace Aftermath.Map
             }
         }
 
+        Structure _structure;
+        internal Structure Structure
+        {
+            get
+            {
+                return _structure;
+            }
+            set
+            {
+                _structure = value;
+            }
+        }
+
         /// <summary>
         /// Creature occupying this tile
         /// </summary>
@@ -261,6 +274,50 @@ namespace Aftermath.Map
             return (Location.X - X)*(Location.X - X) + (Location.Y - Y)*(Location.Y - Y);
         }
 
+        internal bool BlocksLight
+        {
+            get
+            {
+                if (Material.BlocksLight)
+                    return true;
+                if (Structure != null && Structure.BlocksLight)
+                    return true;
+                return false;
+            }
+        }
+
+        internal bool IsSolid
+        {
+            get
+            {
+                if (Material.IsSolid)
+                    return true;
+                if (Structure != null && Structure.IsSolid)
+                    return true;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns whether this tile contains a obstacle that can be destroyed by bashing it
+        /// (note: tiles containing open doors will return false)
+        /// </summary>
+        internal bool ContainsDestructableObstacle
+        {
+            get
+            {
+                if (Structure == null)
+                    return false;
+                return Structure.IsSolid;
+            }
+        }
+
+        internal void PlaceStructure(Structure structure)
+        {
+            _structure = structure;
+            _structure.Tile = this;
+        }
+
         /// <summary>
         /// Returns the light level/brightness of this tile. The light level depends on the eye position 
         /// if the tile is opaque.
@@ -269,8 +326,8 @@ namespace Aftermath.Map
         /// <returns></returns>
         internal Light GetLighting(Tile eyePosition)
         {
-            //if tile is floor then brightness is the comination of sunlight and point lights on this tile
-            if (!Material.IsOpaque)
+            //if tile is floor then brightness is the combination of sunlight and point lights on this tile
+            if (!BlocksLight)
                 return TotalLighting;
             //tile blocks light (eg a wall), so the brightness depends on which side of the wall the eye position is
             //from inside a well lit room the walls appear bright, from outside in the night the walls appear dark
@@ -336,7 +393,7 @@ namespace Aftermath.Map
         Light GetNeighbourLighting(CompassDirection direction)
         {
             Tile n = GetNeighbour(direction);
-            if (n == null || n.Material.IsOpaque)
+            if (n == null || n.BlocksLight)
                 return Light.PitchBlack;
             return n.TotalLighting;
         }
