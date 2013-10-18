@@ -7,21 +7,32 @@ using Aftermath.Input;
 using Aftermath.State;
 using Aftermath.Core;
 using Aftermath.Utils;
+using Microsoft.Xna.Framework;
 
 namespace Aftermath.UI
 {
     class MessageDialog : Dialog
     {
-        public override void Render(XnaRenderer renderer)
+        float x = 0;
+        RectangleF _bounds;
+        public MessageDialog(RectangleF bounds)
         {
-            renderer.Draw(Engine.Instance.TextureManager.GetTexture("house.solidwall"), Position, 0.8f, 0, new Vector2F(0, 0));
-            renderer.DrawStringBox(Text, Position, Microsoft.Xna.Framework.Color.White);
+            _bounds = bounds;
         }
 
-        public RectangleF Position
+        public override void Show()
         {
-            get;
-            set;
+            x = -_bounds.Width;
+            base.Show();
+        }
+
+        public override void Render(XnaRenderer renderer)
+        {
+            x += 5f;
+            if (x > _bounds.X)
+                x = _bounds.X;
+            renderer.Draw(Engine.Instance.TextureManager.GetTexture("overlay.white"), new RectangleF(x, _bounds.Y, _bounds.Width, _bounds.Height), 0.8f, 0, new Vector2F(0, 0), new Color(0.1f,0.1f,0.1f,0.2f));
+            renderer.DrawStringBox(Text, new RectangleF(x + 5, _bounds.Y + 5, _bounds.Width - 10, _bounds.Height - 10), Microsoft.Xna.Framework.Color.White);
         }
 
         public override bool KeyboardFocus
@@ -52,7 +63,7 @@ namespace Aftermath.UI
             }
         }
 
-        internal void SetText(string text, bool takesFocus)
+        internal void SetText(string text, bool takesFocus=false)
         {
             _text = text;
             _focus = takesFocus;

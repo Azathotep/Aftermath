@@ -33,7 +33,6 @@ namespace Aftermath.Core
         World _world;
         TurnSystem _turnSystem;
         Player _player;
-        FovRecursiveShadowcast _fov;
         
         //TODO this shouldnt be public
         public TargetingModule _targetingModule = new TargetingModule();
@@ -68,14 +67,6 @@ namespace Aftermath.Core
             get
             {
                 return _instance;
-            }
-        }
-
-        public FovRecursiveShadowcast Fov
-        {
-            get
-            {
-                return _fov;
             }
         }
 
@@ -121,7 +112,6 @@ namespace Aftermath.Core
 
         public void Initialize()
         {
-            _fov = new FovRecursiveShadowcast();
             _turnSystem.RegisterTurnInhibitor(_animationManager);
             
 
@@ -190,6 +180,8 @@ namespace Aftermath.Core
         {
             Engine.Instance.TurnSystem.Clear();
             scenario.Initialize(out _world, out _player);
+            foreach (PointLight light in _world.Lights)
+                light.RecalculateLightfield();
         }
 
 
@@ -323,7 +315,6 @@ namespace Aftermath.Core
                     else
                     {
                         //tile not visible but remembered. Draw an overlay indicating that tile is not visible.
-                        //DrawTileOverlay(_renderer, tile, new Color(0f, 0f, 0, 0.9f));
                         _renderer.Draw(_textureManager.GetTexture("overlay.gauze"), new RectangleF(x, y, 1, 1), 0.7f, 0, new Vector2F(0.5f, 0.5f), new Color(0, 0, 0, 0.3f));
                     }
                 }
@@ -421,11 +412,6 @@ namespace Aftermath.Core
             _textureManager.RegisterSpriteSheetTextures("house");
             _textureManager.RegisterSpriteSheetTextures("overlay");
             _textureManager.RegisterSpriteSheetTextures("items");
-        }
-
-        internal HashSet<Tile> GetFov(Tile eyePosition, int sightRadius)
-        {
-            return _fov.GetFov(_world, new Vector2I(eyePosition.X, eyePosition.Y), sightRadius);
         }
 
         internal void Exit()

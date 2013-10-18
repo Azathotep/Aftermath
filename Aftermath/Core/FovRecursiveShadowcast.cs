@@ -19,9 +19,13 @@ namespace Aftermath.Core
         int _viewRadius;
         World _world;
 
-        public HashSet<Tile> GetFov(World world, Vector2I eye, int viewRadius)
+        public FovRecursiveShadowcast(World world)
         {
             _world = world;
+        }
+
+        public HashSet<Tile> GetFov(Vector2I eye, int viewRadius)
+        {
             HashSet<Tile> ret = new HashSet<Tile>();
             _eye = eye;
             _viewRadius = viewRadius;

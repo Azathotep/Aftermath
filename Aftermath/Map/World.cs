@@ -12,6 +12,8 @@ namespace Aftermath.Map
     /// </summary>
     public class World
     {
+        FovRecursiveShadowcast _fov;
+
         Tile[,] _tiles;
         int _width, _height;
         public World(int width, int height)
@@ -22,6 +24,15 @@ namespace Aftermath.Map
             for (int y = 0; y < _height; y++)
                 for (int x = 0; x < _width; x++)
                     _tiles[x, y] = new Tile(this, x, y);
+            _fov = new FovRecursiveShadowcast(this);
+        }
+
+        public FovRecursiveShadowcast Fov
+        {
+            get
+            {
+                return _fov;
+            }
         }
 
         /// <summary>

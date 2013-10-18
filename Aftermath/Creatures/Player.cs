@@ -64,6 +64,8 @@ namespace Aftermath.Creatures
 
         internal void ToggleFlashlight()
         {
+            if (Flashlight == null)
+                return;
             Flashlight.On = !Flashlight.On;
             EndTurn();
         }

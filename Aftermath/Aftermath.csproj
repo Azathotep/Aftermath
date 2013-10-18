@@ -63,7 +63,6 @@
     <Compile Include="Map\TileMaterial.cs" />
     <Compile Include="State\AimingState.cs" />
     <Compile Include="State\InteractState.cs" />
-    <Compile Include="State\GamePausedState.cs" />
     <Compile Include="State\GameOverState.cs" />
     <Compile Include="State\MovementState.cs" />
     <Compile Include="State\GameState.cs" />

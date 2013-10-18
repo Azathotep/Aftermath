@@ -35,7 +35,7 @@ namespace Aftermath.UI
                     _selectedItem = Math.Min(_selectedItem + 1, 1);
                     break;
                 case InputKey.Escape:
-                    GameState.CurrentState = GameState.MovementState;
+                    Close();
                     break;
                 case InputKey.Enter:
                     switch (_selectedItem)

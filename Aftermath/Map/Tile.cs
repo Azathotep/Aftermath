@@ -80,7 +80,7 @@ namespace Aftermath.Map
         /// <returns></returns>
         public HashSet<Tile> GetVisibleTiles(int sightRange, float lightThreshold = 0)
         {
-            HashSet<Tile> ret = Engine.Instance.GetFov(this, sightRange);
+            HashSet<Tile> ret = _world.Fov.GetFov(new Vector2I(X, Y), sightRange);
             if (lightThreshold > 0)
             {
                 foreach (Tile tile in ret.ToArray())

@@ -51,6 +51,7 @@ namespace Aftermath.UI
             switch (key)
             {
                 case InputKey.Escape:
+                case InputKey.Space:
                     Close();
                     break;
             }

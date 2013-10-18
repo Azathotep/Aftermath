@@ -18,7 +18,6 @@ namespace Aftermath.State
         public static GameState MovementState = new MovementState();
         public static GameState AimingState = new AimingState();
         public static GameState GameOverState = new GameOverState();
-        public static GameState GamePausedState = new GamePausedState();
         public static GameState InteractState = new InteractState();
 
         static GameState _currentState = GameState.MovementState;

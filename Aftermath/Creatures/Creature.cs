@@ -8,6 +8,7 @@ using Aftermath.Animations;
 using Aftermath.Utils;
 using Aftermath.Weapons;
 using Aftermath.Items;
+using Aftermath.Lighting;
 
 namespace Aftermath.Creatures
 {
@@ -355,6 +356,31 @@ namespace Aftermath.Creatures
             get
             {
                 return _selectedGun;
+            }
+        }
+
+        /// <summary>
+        /// Interact with object on neighbouring tile
+        /// </summary>
+        internal void Interact()
+        {
+            foreach (Tile tile in Location.GetNeighbours())
+            {
+                Door door = tile.Material as Door;
+                if (door != null)
+                {
+                    if (door.IsOpen)
+                        door.Close();
+                    else
+                        door.Open();
+
+                    //if a door opens and closes need to update nearby light fields
+                    //TODO redesign this, no need to update every light on the map
+                    //refactor
+                    foreach (PointLight light in Core.Engine.Instance.World.Lights)
+                        light.RecalculateLightfield();
+                    EndTurn();
+                }
             }
         }
 

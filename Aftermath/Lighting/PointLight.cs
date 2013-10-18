@@ -56,7 +56,7 @@ namespace Aftermath.Lighting
         public void RecalculateLightfield()
         {
             //calcualte the new light field
-            HashSet<Tile> newField = Engine.Instance.GetFov(Location, Brightness);
+            HashSet<Tile> newField = Location.GetVisibleTiles(Brightness);
 
             //generate the set of tiles that either used to be the in lightfield or now are the lightfield
             //these tiles need to recalculate their point lighting

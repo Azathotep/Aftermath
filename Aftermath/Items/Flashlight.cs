@@ -16,7 +16,7 @@ namespace Aftermath.Items
         PointLight _light; 
         public Flashlight(World world)
         {
-            _light = new PointLight(null, 4, new Color(0.8f, 0.8f, 0.2f));
+            _light = new PointLight(null, 4, new Color(0.5f, 0.5f, 0.3f, 0.5f)); //0.8f, 0.8f, 0.2f));
             world.Lights.Add(_light);
         }
 

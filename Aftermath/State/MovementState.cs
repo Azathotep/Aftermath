@@ -49,14 +49,11 @@ namespace Aftermath.State
                     Engine.TurnSystem.CurrentActor.EndTurn();
                     break;
                 case InputKey.I:
-                    GameState.CurrentState = GameState.InteractState;
+                    Engine.Player.Interact();
                     break;
                 case InputKey.Escape:
                     PauseMenu menu = new PauseMenu();
                     menu.Show();
-
-                    //GameState.CurrentState = GameState.GamePausedState;
-                    //Engine.Exit();
                     break;
                 case InputKey.F:
                     //activate aim mode
