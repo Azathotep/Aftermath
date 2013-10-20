@@ -31,16 +31,17 @@ namespace Aftermath.Map
         Creature _creature=null;
         Creature _corpse = null;
 
-        protected TileMaterial _type;
-        internal TileMaterial Material
+
+        protected MaterialType _material;
+        internal MaterialType Material
         {
             get
             {
-                return _type;
+                return _material;
             }
             set
             {
-                _type = value;
+                _material = value;
             }
         }
 
@@ -209,16 +210,16 @@ namespace Aftermath.Map
             }
         }
 
-        Light _pointLighting = Light.PitchBlack;
+        Light _pointLightValue = Light.PitchBlack;
         /// <summary>
         /// Returns the point lighting at this tile. Eg flashlights, bulbs. Point lighting is expensive to compute so is
         /// cached.
         /// </summary>
-        Light PointLighting
+        public Light PointLightValue
         {
             get
             {
-                return _pointLighting;
+                return _pointLightValue;
             }
         }
 
@@ -230,19 +231,19 @@ namespace Aftermath.Map
         {
             get
             {
-                Color totalColor = new Color(AmbientLighting.Color.R + PointLighting.Color.R,
-                    AmbientLighting.Color.G + PointLighting.Color.G,
-                    AmbientLighting.Color.B + PointLighting.Color.B);
-                return new Light(AmbientLighting.Brightness + PointLighting.Brightness, totalColor);
+                Color totalColor = new Color(AmbientLighting.Color.R + PointLightValue.Color.R,
+                    AmbientLighting.Color.G + PointLightValue.Color.G,
+                    AmbientLighting.Color.B + PointLightValue.Color.B);
+                return new Light(AmbientLighting.Brightness + PointLightValue.Brightness, totalColor);
             }
         }
 
         /// <summary>
-        /// Recalculates the point lighting of the tile from all nearby point lights
+        /// Recalculates the point light value of the tile from all nearby point lights
         /// </summary>
-        public void RecalculatePointLighting()
+        public void RecalculatePointLightValue()
         {
-            _pointLighting = Light.PitchBlack;
+            _pointLightValue = Light.PitchBlack;
             float totalBr = 0;
             foreach (PointLight light in _world.Lights)
             {
@@ -251,10 +252,10 @@ namespace Aftermath.Map
                 lightColor *= totalBr * 0.5f;
                 if (totalBr > 0)
                 {
-                    _pointLighting.Color.R = (byte)Math.Min(_pointLighting.Color.R + lightColor.R, 255);
-                    _pointLighting.Color.G = (byte)Math.Min(_pointLighting.Color.G + lightColor.G, 255);
-                    _pointLighting.Color.B = (byte)Math.Min(_pointLighting.Color.B + lightColor.B, 255);
-                    _pointLighting.Brightness += totalBr;
+                    _pointLightValue.Color.R = (byte)Math.Min(_pointLightValue.Color.R + lightColor.R, 255);
+                    _pointLightValue.Color.G = (byte)Math.Min(_pointLightValue.Color.G + lightColor.G, 255);
+                    _pointLightValue.Color.B = (byte)Math.Min(_pointLightValue.Color.B + lightColor.B, 255);
+                    _pointLightValue.Brightness += totalBr;
                 }
             }
         }
@@ -278,7 +279,7 @@ namespace Aftermath.Map
         {
             get
             {
-                if (Material.BlocksLight)
+                if (MaterialInfo.BlocksLight(Material))
                     return true;
                 if (Structure != null && Structure.BlocksLight)
                     return true;
@@ -290,7 +291,7 @@ namespace Aftermath.Map
         {
             get
             {
-                if (Material.IsSolid)
+                if (MaterialInfo.IsSolid(Material))
                     return true;
                 if (Structure != null && Structure.IsSolid)
                     return true;
@@ -315,7 +316,7 @@ namespace Aftermath.Map
         internal void PlaceStructure(Structure structure)
         {
             _structure = structure;
-            _structure.Tile = this;
+            _structure.Location = this;
         }
 
         /// <summary>
@@ -407,6 +408,22 @@ namespace Aftermath.Map
             }
         }
 
+        bool _hasBeenSeen = false;
+        /// <summary>
+        /// Returns whether player has seen this tile
+        /// </summary>
+        public bool HasBeenSeen
+        {
+            get
+            {
+                return _hasBeenSeen;
+            }
+            set
+            {
+                _hasBeenSeen = value;
+            }
+        }
+
         /// <summary>
         /// Drops scent marker on this tile
         /// </summary>
@@ -414,6 +431,29 @@ namespace Aftermath.Map
         internal void DropScent(int lifetime)
         {
             _scent = Engine.Instance.TurnSystem.TurnNumber + lifetime;
+        }
+
+        internal void Serialize(System.IO.BinaryWriter bw)
+        {
+            bw.Write((bool)_hasBeenSeen);
+            bw.Write((ushort)Material);
+            bw.Write((float)PointLightValue.Brightness);
+            bw.Write((byte)PointLightValue.Color.R);
+            bw.Write((byte)PointLightValue.Color.G);
+            bw.Write((byte)PointLightValue.Color.B);
+            bw.Write((int)_scent);
+        }
+
+        internal void Deserialize(System.IO.BinaryReader br)
+        {
+            _hasBeenSeen = br.ReadBoolean();
+            Material = (MaterialType)br.ReadUInt16();
+            float brightness = br.ReadSingle();
+            byte colorR = br.ReadByte();
+            byte colorG = br.ReadByte();
+            byte colorB = br.ReadByte();
+            _pointLightValue = new Light(brightness, new Microsoft.Xna.Framework.Color(colorR, colorG, colorB));
+            _scent = br.ReadInt32();
         }
     }
 }

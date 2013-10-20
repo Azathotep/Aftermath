@@ -67,7 +67,7 @@ namespace Aftermath.Lighting
             _lightField = newField;
 
             foreach (Tile tile in toRecalculate)
-                tile.RecalculatePointLighting();
+                tile.RecalculatePointLightValue();
         }
 
         /// <summary>

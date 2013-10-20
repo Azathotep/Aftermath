@@ -42,15 +42,15 @@ namespace Aftermath.Map
                 {
                     Tile tile = city.GetTile(x, y);
                     Color c = bm.GetPixel(x, y);
-                    tile.Material = new Floor(FloorType.Pavement);
+                    tile.Material = MaterialType.Pavement;
                     if (c == wallColor)
-                        tile.Material = new Wall();
+                        tile.Material = MaterialType.WoodWall;
                     if (c == roadColor)
-                        tile.Material = new Road(RoadType.Concrete);
+                        tile.Material = MaterialType.Road;
                     if (c == roadLineColor)
-                        tile.Material = new Road(RoadType.Line);
+                        tile.Material = MaterialType.Road;
                     if (c == carpetColor || c == zombieColor)
-                        tile.Material = new Floor(FloorType.Carpet);
+                        tile.Material = MaterialType.Carpet;
                     if (c == doorColor || c == closedDoorColor)
                     {
                         Door door = new Door();
@@ -59,7 +59,7 @@ namespace Aftermath.Map
                         tile.PlaceStructure(door);
                     }
                     if (c == glassColor)
-                        tile.Material = new Glass();
+                        tile.Material = MaterialType.Glass;
                     //if (c == lightColor)
                     //{
                     //    tile.Material = new Floor(FloorType.Carpet);
@@ -69,7 +69,7 @@ namespace Aftermath.Map
                     //}
                     if (c == playerColor)
                     {
-                        tile.Material = new Floor(FloorType.Carpet);
+                        tile.Material = MaterialType.Carpet;
                         _playerStart = tile;
                     }
                     if (c == zombieColor)

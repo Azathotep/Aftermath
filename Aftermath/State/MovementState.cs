@@ -43,10 +43,13 @@ namespace Aftermath.State
                         color = new Color(0f, 1f, 0f);
                     else if (Dice.Next(3) == 0)
                         color = new Color(0f, 0f, 1f);
+
+                    Engine.SaveAndRestore();
+
                     //PointLight l = new PointLight(Core.Engine.Instance.Player.Location, 6, color);
                     //Core.Engine.Instance.World.Lights.Add(l);
                     //l.RecalculateLightfield();
-                    Engine.TurnSystem.CurrentActor.EndTurn();
+                    //Engine.TurnSystem.CurrentActor.EndTurn();
                     break;
                 case InputKey.I:
                     Engine.Player.Interact();

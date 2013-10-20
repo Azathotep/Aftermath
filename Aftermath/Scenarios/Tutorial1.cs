@@ -28,7 +28,7 @@ namespace Aftermath.Scenarios
             _player = player;
             player.WeildGun(new Pistol9mm());
             builder.PlayerStart.PlaceCreature(player);
-            player.Flashlight = new Items.Flashlight(world);
+            player.Flashlight = new Items.Flashlight();
             world.TimeOfDay = 3 * 60;
             _zombie = new Zombie();
             world.GetTile(9, 4).PlaceCreature(_zombie);

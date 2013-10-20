@@ -14,10 +14,17 @@ namespace Aftermath.Items
     public class Flashlight
     {
         PointLight _light; 
-        public Flashlight(World world)
+        public Flashlight()
         {
-            _light = new PointLight(null, 4, new Color(0.5f, 0.5f, 0.3f, 0.5f)); //0.8f, 0.8f, 0.2f));
-            world.Lights.Add(_light);
+            _light = new PointLight(null, 4, new Color(0.5f, 0.5f, 0.3f, 0.5f)); //0.8f, 0.8f, 0.2f)); 
+        }
+
+        public PointLight Light
+        {
+            get
+            {
+                return _light;
+            }
         }
 
         public bool On

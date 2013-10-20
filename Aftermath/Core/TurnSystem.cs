@@ -163,6 +163,7 @@ namespace Aftermath.Core
 
         internal void Clear()
         {
+            _currentActor = null;
             _turns.Clear();
         }
     }

@@ -63,18 +63,34 @@ namespace Aftermath.Map
             _isOpen = false;
         }
 
-        int _health = 10;
-        public override void Damage(int damageAmount)
+        public override void Damage(short damageAmount)
         {
             if (_health <= 0)
                 return;
             _health -= damageAmount;
-            Engine.Instance.AnimationManager.StartAnimation(new BashAnimation(Tile));
+            Engine.Instance.AnimationManager.StartAnimation(new BashAnimation(Location));
             if (_health <= 0)
             {
                 _isOpen = true;
                 _health = 0;
             }
+        }
+
+        public override StructureType Type
+        {
+            get { return StructureType.Door; }
+        }
+
+        public override void Serialize(System.IO.BinaryWriter bw)
+        {
+            base.Serialize(bw);
+            bw.Write((bool)_isOpen);
+        }
+
+        public override void Deserialize(System.IO.BinaryReader br)
+        {
+            base.Deserialize(br);
+            _isOpen = br.ReadBoolean();
         }
     }
 }

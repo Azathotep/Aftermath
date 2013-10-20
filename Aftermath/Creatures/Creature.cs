@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using Aftermath.Core;
 using Aftermath.Map;
 using Aftermath.Animations;
@@ -171,12 +172,11 @@ namespace Aftermath.Creatures
             }
         }
 
-        protected bool _isAlive = true;
         public bool IsAlive
         {
             get
             {
-                return _isAlive;
+                return _health >= 0;
             }
         }
 
@@ -287,12 +287,12 @@ namespace Aftermath.Creatures
             _inventory.Add(item);
         }
 
-        protected int _health = 20;
+        protected short _health = 20;
         /// <summary>
         /// Invoke damage on the creature
         /// </summary>
         /// <param name="damageAmount">amount of damage</param>
-        internal void PutDamage(int damageAmount)
+        internal void PutDamage(short damageAmount)
         {
             //TODO add damage type (eg bullet, fire, etc)
             //TODO find better method name, InduceDamage or CauseDamage or something..
@@ -305,7 +305,6 @@ namespace Aftermath.Creatures
 
         void Die()
         {
-            _isAlive = false;
             _tile.Creature = null;
             _tile.Corpse = this;
         }
@@ -415,6 +414,29 @@ namespace Aftermath.Creatures
         public virtual void Hear(Sound sound)
         {
             _heardSound = sound;
+        }
+
+        public short Health 
+        {
+            get
+            {
+                return _health;
+            }
+        }
+
+        public abstract CreatureType Type
+        {
+            get;
+        }
+
+        public virtual void Serialize(BinaryWriter bw)
+        {
+            bw.Write((short)_health);
+        }
+
+        public virtual void Deserialize(BinaryReader br, World world)
+        {
+            _health = br.ReadInt16();
         }
     }
 

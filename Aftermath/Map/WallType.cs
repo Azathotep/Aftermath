@@ -7,13 +7,13 @@ namespace Aftermath.Map
 {
     public enum FloorType
     {
-        Carpet,
-        Pavement
+        Carpet=0,
+        Pavement=1
     }
 
     public enum RoadType
     {
-        Concrete,
-        Line
+        Concrete=0,
+        Line=1
     }
 }

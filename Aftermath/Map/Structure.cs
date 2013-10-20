@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Aftermath.Rendering;
+using System.IO;
 
 namespace Aftermath.Map
 {
@@ -41,7 +42,10 @@ namespace Aftermath.Map
             }
         }
 
-        public Tile Tile
+        /// <summary>
+        /// Location of the structure on the map
+        /// </summary>
+        public Tile Location
         {
             get;
             set;
@@ -51,9 +55,32 @@ namespace Aftermath.Map
         /// Applies damage to the structure.
         /// </summary>
         /// <param name="damageAmount">amount to damage</param>
-        public virtual void Damage(int damageAmount)
+        public virtual void Damage(short damageAmount)
         {
 
+        }
+
+        /// <summary>
+        /// Returns a unique Id for this stucture for serialization
+        /// </summary>
+        public abstract StructureType Type
+        {
+            get;
+        }
+
+        protected short _health = 10;
+
+        /// <summary>
+        /// Method called to serialize the structure
+        /// </summary>
+        public virtual void Serialize(BinaryWriter bw)
+        {
+            bw.Write((short)_health);
+        }
+
+        public virtual void Deserialize(BinaryReader br)
+        {
+            _health = br.ReadInt16();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Aftermath.Core;
+using Aftermath.Utils;
 using Aftermath.Lighting;
 
 namespace Aftermath.Map
@@ -71,7 +72,7 @@ namespace Aftermath.Map
             Random r = new Random();
             for (int i = 0; i < 1000; i++)
             {
-                Tile tile = GetTile(r.Next(_width), r.Next(_height));
+                Tile tile = GetTile(Dice.Next(_width), Dice.Next(_height));
                 if (tile.IsSolid || tile.Creature != null)
                     continue;
                 return tile;
@@ -139,6 +140,11 @@ namespace Aftermath.Map
             {
                 return _lights;
             }
+        }
+
+        internal void RegisterPointLight(PointLight pointLight)
+        {
+            _lights.Add(pointLight);
         }
     }
 }

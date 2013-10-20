@@ -113,13 +113,12 @@ namespace Aftermath.Core
         public void Initialize()
         {
             _turnSystem.RegisterTurnInhibitor(_animationManager);
-            
 
             CityBuilder builder = new CityBuilder();
             _world = builder.FromBitmap(@"Content\city.bmp");
 
             _player = new Player();
-            
+
 
             _player.WeildGun(new Pistol9mm());
             _world.GetRandomEmptyTile().PlaceCreature(_player);
@@ -127,7 +126,10 @@ namespace Aftermath.Core
             _world.TimeOfDay = 5 * 60;
 
             //give the player a flashlight
-            _player.Flashlight = new Flashlight(_world);
+            _player.Flashlight = new Flashlight();
+            _player.Flashlight.On = true;
+            _world.RegisterPointLight(_player.Flashlight.Light);
+            _player.Flashlight.SetPosition(_player.Location);
 
             _player.Location.GetNeighbour(CompassDirection.North).PlaceItem(new Pistol9mm());
 
@@ -149,9 +151,7 @@ namespace Aftermath.Core
                 }
                 tile.PlaceCreature(zombie);
             }
-
-            //LoadScenario(new Tutorial1());
-
+                //LoadScenario(new Tutorial1());
             
             _keyboardHandler.RegisterKey(InputKey.W, retriggerInterval:0);
             _keyboardHandler.RegisterKey(InputKey.A, retriggerInterval: 0);
@@ -176,6 +176,24 @@ namespace Aftermath.Core
             _keyboardHandler.RegisterKey(InputKey.Space, retriggerInterval: 20);
         }
 
+        /// <summary>
+        /// Test method which saves the map to disk and then reloads it. To test that nothing changes.
+        /// </summary>
+        public void SaveAndRestore()
+        {
+            ChunkSerializer serializer = new ChunkSerializer();
+            serializer.Serialize(_world, @"map1.map");
+            _turnSystem.Clear();
+            _world = serializer.Deserialize(@"map1.map");
+            for (int y = 0; y < _world.Height; y++)
+                for (int x = 0; x < _world.Width; x++)
+                {
+                    Tile tile = _world.GetTile(x, y);
+                    if (tile.Creature != null && tile.Creature.IsPlayerControlled)
+                        _player = tile.Creature as Player;
+                }
+        }
+
         void LoadScenario(Scenario scenario)
         {
             Engine.Instance.TurnSystem.Clear();
@@ -183,7 +201,6 @@ namespace Aftermath.Core
             foreach (PointLight light in _world.Lights)
                 light.RecalculateLightfield();
         }
-
 
         void KeyHandler(InputKey key)
         {
@@ -197,7 +214,6 @@ namespace Aftermath.Core
         public event EventHandler OnExit;
 
         HashSet<Tile> _playerVisibleTiles = new HashSet<Tile>();
-        HashSet<Tile> _playerSeenTiles = new HashSet<Tile>();
         int _playerLastVisibleFilesFetchTime;
 
         float _zoomAmt = 0;
@@ -215,9 +231,7 @@ namespace Aftermath.Core
             {
                 _playerVisibleTiles = _player.GetVisibleTiles(0.4f);
                 foreach (Tile visibleTile in _playerVisibleTiles)
-                {
-                    _playerSeenTiles.Add(visibleTile);
-                }
+                    visibleTile.HasBeenSeen = true;
                 _playerLastVisibleFilesFetchTime = TurnSystem.MinorTurnNumber;
             }
 
@@ -258,17 +272,16 @@ namespace Aftermath.Core
                         continue;
 
                     float rotation;
-                    string textureName = tile.Material.GetTexture(tile, out rotation);
+                    string textureName = MaterialInfo.GetTextureName(tile, out rotation);
 
                     bool isVisible = _playerVisibleTiles.Contains(tile);
-                    bool hasSeen = _playerSeenTiles.Contains(tile);
                     
                     //obtain the lighting of this tile from the player's location
                     Light light = tile.GetLighting(Engine.Instance.Player.Location);
 
                     //isVisible = true;
 
-                    if (!isVisible && !hasSeen)
+                    if (!isVisible && !tile.HasBeenSeen)
                         continue;
                     Color color;
                     //if the tile is visible then draw the color using the tile's light, otherwise draw it dark
@@ -357,12 +370,15 @@ namespace Aftermath.Core
             _renderer.Begin(world, projection, view);
 
             //display bullets
-            for (int x = 0; x < _player.SelectedGun.LoadedAmmo; x++)
+            if (_player.SelectedGun != null)
             {
-                _renderer.Draw(new GameTexture("bullet", new RectangleI(0, 0, 32, 32)), new RectangleF(0 + x * 16, 0, 32, 32), 0.2f, 0, new Vector2F(0f, 0f), Color.AliceBlue);
-            }
+                for (int x = 0; x < _player.SelectedGun.LoadedAmmo; x++)
+                {
+                    _renderer.Draw(new GameTexture("bullet", new RectangleI(0, 0, 32, 32)), new RectangleF(0 + x * 16, 0, 32, 32), 0.2f, 0, new Vector2F(0f, 0f), Color.AliceBlue);
+                }
 
-            _renderer.DrawStringBox("Ammo: " + _player.SelectedGun.LoadedAmmo, new RectangleF(200, 10, 550, 50), Color.White);
+                _renderer.DrawStringBox("Ammo: " + _player.SelectedGun.LoadedAmmo, new RectangleF(200, 10, 550, 50), Color.White);
+            }
 
             if (!Engine.Instance.Player.IsAlive)
             {
@@ -378,17 +394,6 @@ namespace Aftermath.Core
         private void DrawTileOverlay(XnaRenderer renderer, Tile tile, Color color)
         {
             renderer.Draw(_textureManager.GetTexture("overlay.white"), new RectangleF(tile.X, tile.Y, 1, 1), 0.4f, 0, new Vector2F(0.5f, 0.5f), color);
-        }
-
-        /// <summary>
-        /// Set of tiles the player has seen/remembered
-        /// </summary>
-        public HashSet<Tile> PlayerSeenTiles
-        {
-            get
-            {
-                return _playerSeenTiles;
-            }
         }
 
         void DrawCrosshair()

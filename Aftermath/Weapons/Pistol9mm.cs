@@ -7,12 +7,13 @@ using Aftermath.Creatures;
 using Aftermath.Map;
 using Aftermath.Animations;
 using Aftermath.Rendering;
+using Aftermath.Items;
 
 namespace Aftermath.Weapons
 {
     public class Pistol9mm : Gun
     {
-        public override bool Fire(Creatures.Creature firer, Map.Tile targetTile)
+        public override bool Fire(Creature firer, Tile targetTile)
         {
             if (LoadedAmmo < 0)
                 return false;
@@ -30,6 +31,11 @@ namespace Aftermath.Weapons
             {
                 return Engine.Instance.TextureManager.GetTexture("items.9mm");
             }
+        }
+
+        public override ItemType Type
+        {
+            get { return ItemType.Pistol9mm; }
         }
     }
 }

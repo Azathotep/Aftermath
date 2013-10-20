@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using Aftermath.Map;
 using Aftermath.Rendering;
 using Aftermath.Core;
@@ -19,6 +20,11 @@ namespace Aftermath.Items
             }
         }
 
+        public abstract ItemType Type
+        {
+            get;
+        }
+
         public void Place(Tile targetTile)
         {
             _location = targetTile;
@@ -34,6 +40,14 @@ namespace Aftermath.Items
         {
             _location.Item = null;
             _location = null;
+        }
+
+        public virtual void Serialize(BinaryWriter bw)
+        {
+        }
+
+        public virtual void Deserialize(BinaryReader br)
+        {
         }
     }
 }

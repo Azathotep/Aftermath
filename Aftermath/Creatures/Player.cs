@@ -6,6 +6,7 @@ using Aftermath.Rendering;
 using Aftermath.Utils;
 using Aftermath.Lighting;
 using Aftermath.Items;
+using Aftermath.Map;
 
 namespace Aftermath.Creatures
 {
@@ -22,6 +23,11 @@ namespace Aftermath.Creatures
             {
                 return true;
             }
+        }
+
+        public override CreatureType Type
+        {
+            get { return CreatureType.Player; }
         }
 
         public override GameTexture Texture
@@ -58,7 +64,6 @@ namespace Aftermath.Creatures
             set
             {
                 _flashlight = value;
-                _flashlight.SetPosition(Location);  
             }
         }
 
@@ -68,6 +73,44 @@ namespace Aftermath.Creatures
                 return;
             Flashlight.On = !Flashlight.On;
             EndTurn();
+        }
+
+        public override void Serialize(System.IO.BinaryWriter bw)
+        {
+            base.Serialize(bw);
+            bool hasFlashlight = Flashlight != null;
+            bw.Write((bool)hasFlashlight);
+            if (hasFlashlight)
+            {
+                bw.Write(Flashlight.On);
+            }
+
+            //inventory
+            bw.Write((ushort)Inventory.Count);
+            foreach (Item item in Inventory)
+            {
+                bw.Write((ushort)item.Type);
+                item.Serialize(bw);
+            }
+        }
+
+        public override void Deserialize(System.IO.BinaryReader br, World world)
+        {
+            base.Deserialize(br, world);
+            bool hasFlashlight = br.ReadBoolean();
+            if (hasFlashlight)
+            {
+                Flashlight = new Flashlight();
+                world.RegisterPointLight(Flashlight.Light);
+                Flashlight.On = br.ReadBoolean();
+            }
+            //inventory
+            int numItems = br.ReadUInt16();
+            for (int i=0;i<numItems;i++)
+            {
+                Item item = ChunkSerializer.DeserializeItem(br);
+                AddItemToInventory(item);
+            }
         }
     }
 }

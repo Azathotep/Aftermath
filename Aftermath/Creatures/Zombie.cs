@@ -15,8 +15,6 @@ namespace Aftermath.Creatures
     {
         const int ZombieDefaultSightDistance = 8;
         const int ZombieEnragedSightDistance = 16;
-        static int playermap_generatedTime = -1;
-        static HomingField playermap=null;
 
         byte _rageLevel = 0;
         ZombieState _state = ZombieState.Idle;
@@ -341,9 +339,42 @@ namespace Aftermath.Creatures
                 return _state;
             }
         }
+
+        public override CreatureType Type
+        {
+            get { return CreatureType.Zombie; }
+        }
+
+        public override void Serialize(System.IO.BinaryWriter bw)
+        {
+            base.Serialize(bw);
+            bw.Write((byte)_rageLevel);
+            bw.Write((byte)_state);
+            bool hasTarget = _targetTile != null;
+            bw.Write((bool)hasTarget);
+            if (hasTarget)
+            {
+                bw.Write((ushort)_targetTile.X);
+                bw.Write((ushort)_targetTile.Y);
+            }
+        }
+
+        public override void Deserialize(System.IO.BinaryReader br, World world)
+        {
+            base.Deserialize(br, world);
+            _rageLevel = br.ReadByte();
+            _state = (ZombieState)br.ReadByte();
+            bool hasTarget = br.ReadBoolean();
+            if (hasTarget)
+            {
+                ushort x = br.ReadUInt16();
+                ushort y = br.ReadUInt16();
+                _targetTile = world.GetTile(x, y);
+            }
+        }
     }
 
-    enum ZombieState
+    enum ZombieState : byte
     {
         Idle,
         Alert,
