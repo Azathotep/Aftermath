@@ -16,8 +16,11 @@ namespace SpriteSheetBuilder
                 return;
             }
             string imageFolder = args[0];
+            string outputFolder = imageFolder;
+            if (args.Length > 1)
+                outputFolder = args[1];
             SpriteSheetBuilder sheetBuilder = new SpriteSheetBuilder();
-            sheetBuilder.CreateFromFolder(imageFolder);
+            sheetBuilder.CreateFromFolder(imageFolder, outputFolder);
         }
     }
 }

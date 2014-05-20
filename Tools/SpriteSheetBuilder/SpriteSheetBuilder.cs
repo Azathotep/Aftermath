@@ -48,7 +48,7 @@ namespace SpriteSheetBuilder
         /// </summary>
         /// <param name="inputFolder">input folder containing all the image files to include in the spritesheet.
         /// The images must be square and a multiple of two in width</param>
-        public void CreateFromFolder(string inputFolder)
+        public void CreateFromFolder(string inputFolder, string outputFolder)
         {
             string[] files = Directory.GetFiles(inputFolder, "*.png");
 
@@ -104,8 +104,8 @@ namespace SpriteSheetBuilder
                 }
             }
             //save the sheet and its xml data
-            mainElement.Save(inputFolder + @"\" + sheetName + ".xml");
-            sheetImageFilePath = inputFolder + @"\" + sheetName + ".png";
+            mainElement.Save(outputFolder + @"\" + sheetName + ".xml");
+            sheetImageFilePath = outputFolder + @"\" + sheetName + ".png";
             //System.Threading.Thread.Sleep(50000);
             File.Delete(sheetImageFilePath);
             output.Save(sheetImageFilePath, ImageFormat.Png);
