@@ -28,8 +28,11 @@ namespace SpriteSheetBuilder
 
             int outX = sheetX * subImageSize;
             int outY = sheetY * subImageSize;
-            using (Graphics inputGraphics = Graphics.FromImage(input))
+            Bitmap newBitmap = new Bitmap(input.Width, input.Height);
+
+            using (Graphics inputGraphics = Graphics.FromImage(newBitmap))
             {
+                inputGraphics.DrawImage(input, 0, 0);
                 sheet.DrawImage(input, outX + 1, outY + 1, input.Width, imageSize);
                 sheet.DrawImage(input, new Rectangle(outX, outY + 1, 1, imageSize), new Rectangle(0, 0, 1, imageSize), GraphicsUnit.Pixel);
                 sheet.DrawImage(input, new Rectangle(outX + subImageSize - 1, outY + 1, 1, imageSize), new Rectangle(imageSize - 1, 0, 1, imageSize), GraphicsUnit.Pixel);
